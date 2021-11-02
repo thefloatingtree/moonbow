@@ -1,5 +1,6 @@
-import { Path, Point, Project } from 'paper/dist/paper-core'
 import * as PIXI from 'pixi.js'
+import { SmoothStroke } from './SmoothStroke'
+import { lerp } from './util'
 
 
 class Izzy {
@@ -10,18 +11,24 @@ class Izzy {
         this.test = PIXI.Texture.from('src/izzy/assets/efficiency.png')
         this.artist = new Artist()
 
-        this.paperProject = new Project() // This is required for all paper.js objects to work despite not using paper.js's visualiztion tools
+        this.width = null
+        this.height = null
 
         this.liveBrushStroke = null
     }
 
     init(canvasRef, { width = 800, height = 600 } = {}) {
         this.ref = canvasRef
+
+        this.width = width
+        this.height = height
+
         this.renderer = new PIXI.autoDetectRenderer({
             view: this.ref,
             width,
             height,
-            backgroundColor: 0x000000
+            backgroundColor: 0x000000, 
+            antialias: false 
         })
 
         this.artist.init(this)
@@ -30,21 +37,29 @@ class Izzy {
     }
 
     addBrushNode(x, y, pressure) {
-        // const sprite = PIXI.Sprite.from(this.test)
-
-        // sprite.position.set(x, y)
-        // sprite.anchor.set(0.5)
-        // // sprite.tint
-        // // sprite.alpha
-        // sprite.scale.set(pressure / 10)
-
-        // this.container.addChild(sprite)
         this.liveBrushStroke.addNode({ x, y, pressure })
     }
 
     beginBrushStroke() {
         this.liveBrushStroke = new BrushStroke(this.test)
         this.container.addChild(this.liveBrushStroke.container)
+    }
+
+    endBrushStroke() {
+
+        // console.time('renderStroke')
+        // console.log(this.liveBrushStroke.container.children.length)
+        const renderTexture = PIXI.RenderTexture.create({
+            width: this.width,
+            height: this.height
+        })
+        this.renderer.render(this.liveBrushStroke.container, { renderTexture })
+
+        const sprite = new PIXI.Sprite(renderTexture)
+        
+        this.container.removeChild(this.liveBrushStroke.container)
+        this.container.addChild(sprite)
+        // console.timeEnd('renderStroke')
     }
 
     update() {
@@ -55,38 +70,35 @@ class Izzy {
 
 class BrushStroke {
     constructor(brushTip) {
-        this.path = new Path()
-        this.rawPoints = []
-        this.bezierPoints = []
-        this.points = []
+        // this.path = new paper.Path()
         this.container = new PIXI.Container()
         this.brushTip = brushTip
+        this.smoothStroke = new SmoothStroke()
 
-        this.mostRecentPoint = null
-
-        this.pressure = 0.01
+        this.lastPressure = 0
     }
 
     addNode({ x, y, pressure } = {}) {
+        
+        // console.time('addNode')
+        const points = this.smoothStroke.addPoint(x, y)
+        for (let i = 0; i < points.length; i++) {
+            const point = points[i]
 
-        const lastIndex = this.path.length
-
-        this.path.add(new Point(x, y))
-        this.path.smooth({ type: 'catmull-rom', factor: 0.4 })
-
-        for (let i = lastIndex; i < this.path.length; i++) {
-            const point = this.path.getPointAt(i)
+            const interpolatedPressure = lerp(this.lastPressure, pressure, i / points.length)
+            const actualPressure = points.length === 1 ? pressure : interpolatedPressure
 
             const sprite = PIXI.Sprite.from(this.brushTip)
             sprite.position.set(point.x, point.y)
             sprite.anchor.set(0.5)
             // sprite.tint
             // sprite.alpha
-            sprite.scale.set(this.pressure / 10)
+            sprite.scale.set(actualPressure / 50)
             this.container.addChild(sprite)
         }
+        this.lastPressure = pressure
+        // console.timeEnd('addNode')
 
-        this.pressure = this.pressure <= 1 ? this.pressure + 0.01 : 1
     }
 }
 
@@ -100,12 +112,14 @@ class Artist {
         this.canvas = canvas
 
         // Add event listners
-        this.canvas.ref.addEventListener('pointerdown', () => {
+        this.canvas.ref.addEventListener('pointerdown', (e) => {
             this.pointerDown = true
             this.canvas.beginBrushStroke()
+            this.canvas.addBrushNode(e.clientX, e.clientY, e.pressure)
         })
         this.canvas.ref.addEventListener('pointerup', () => {
             this.pointerDown = false
+            this.canvas.endBrushStroke()
         })
         this.canvas.ref.addEventListener('pointermove', (e) => {
             if (this.pointerDown) {
