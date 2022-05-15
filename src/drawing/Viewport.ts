@@ -38,6 +38,10 @@ export class Viewport {
         )
     }
 
+    convertScreenToCanvas(x, y) {
+        return this.container.transform.worldTransform.applyInverse(new PIXI.Point(x, y))
+    }
+
     setupEvents() {
         window.addEventListener('mousemove', (e) => {
             // Keyboard Zoom
@@ -45,6 +49,10 @@ export class Viewport {
                 this.navigation.scale += e.movementX / 100
                 if (this.navigation.scale > 5) this.navigation.scale = 5
                 if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
+
+                if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+                if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
+
                 this.updateContainerTransform()
             }
 

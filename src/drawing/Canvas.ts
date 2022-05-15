@@ -1,85 +1,75 @@
 import getStroke, { getStrokePoints } from 'perfect-freehand'
 import * as PIXI from 'pixi.js'
 import { app } from './App'
-import { Easing, lerp } from './util'
+import { cardinalSpline, Easing, lerp } from './util'
 
 export class Canvas {
     container: PIXI.Container
     pointerDown: boolean
     
-    liveBrushStroke
-    renderer: PIXI.AbstractRenderer
-
     brushTexture: PIXI.RenderTexture
+    liveBrushStroke: BrushStroke = new BrushStroke()
 
     settings = {
-        width: 500,
-        height: 500,
+        width: 1500,
+        height: 1500,
         backgroundColor: 0xFFFFFF
     }
 
     constructor() {
         this.container = new PIXI.Container()
 
-        this.renderer = PIXI.autoDetectRenderer({
-            width: this.settings.width,
-            height: this.settings.height,
-            backgroundColor: this.settings.backgroundColor,
-            antialias: true
-        })
-
         const background = new PIXI.Graphics()
             .beginFill(this.settings.backgroundColor)
-            .drawRect(0, 0, 500, 500)
+            .drawRect(0, 0, this.settings.width, this.settings.height)
             .endFill()
-        // this.container.addChild(background)
-
-        // const brushGraphic = new PIXI.Graphics()
-        //     .beginFill(0x000000)
-        //     .drawCircle(10, 10, 10)
-        //     .endFill()
-        
-        // const renderTexture = PIXI.RenderTexture.create({ width: brushGraphic.width, height: brushGraphic.height })
-        // this.renderer.render(brushGraphic, { renderTexture })
-
-        const test = new BrushStroke()
-        test.addNode(0, 0, 0)
-        this.container.addChild(test.container)
+        this.container.addChild(background)
     }
 
-    setupEvents() {
-        // Add event listners
-        app.ref.addEventListener('pointerdown', (e) => {
-            // const { x, y } = this._getRelativePointerPosition(e)
+    startBrushStroke(e: PointerEvent) {
+        this.pointerDown = true
 
-            this.pointerDown = true
-            // app.beginBrushStroke()
-            // app.addBrushNode(x, y, e.pressure)
+        this.liveBrushStroke = new BrushStroke()
+        this.container.addChild(this.liveBrushStroke.container)
+    }
+
+    updateBrushStroke(e: PointerEvent) {
+        if (this.pointerDown) {
+            let { x, y } = e
+
+            const adjusted = app.viewport.convertScreenToCanvas(x, y)
+
+            this.liveBrushStroke.addNode(adjusted.x, adjusted.y, e.pressure)
+        }
+    }
+
+    endBrushStroke(e: PointerEvent) {
+        this.pointerDown = false
+
+        const canvasTexture = PIXI.RenderTexture.create({
+            width: this.settings.width,
+            height: this.settings.height
         })
-        app.ref.addEventListener('pointerup', () => {
-            this.pointerDown = false
-            // app.endBrushStroke()
-        })
-        app.ref.addEventListener('pointermove', (e) => {
-            if (this.pointerDown) {
-                // let { x, y } = this._getRelativePointerPosition(e)
-                // app.addBrushNode(x, y, e.pressure)
-                console.log(e.x)
-            }
-        })
+        app.application.renderer.render(this.container, { renderTexture: canvasTexture })
+        const canvasSprite = new PIXI.Sprite(canvasTexture)
+        
+        this.container.removeChildren()
+
+        this.container.addChild(canvasSprite)
     }
 }
 
 export class BrushStroke {
 
     container: PIXI.Container = new PIXI.Container()
+    smoothStroke: SmoothStroke = new SmoothStroke()
+
     lastPressure: number = 0
 
     addNode(x: number, y: number, pressure: number, texture?: PIXI.RenderTexture) {
-        const points = getStrokePoints([[0, 0], [100, 100], [340, 123], [500, 500]], { streamline: 0.5 })
+        const points = this.smoothStroke.addPoint(x, y)
         for (let i = 0; i < points.length; i++) {
-            const [x, y] = points[i].point
-            console.log(points[i])
+            const { x, y } = points[i]
 
             // const interpolatedPressure = lerp(this.lastPressure, pressure, i / points.length)
             // const actualPressure = points.length === 1 ? pressure : interpolatedPressure
@@ -95,9 +85,9 @@ export class BrushStroke {
             const sprite = PIXI.Sprite.from('./src/assets/hard_round.png')
             sprite.position.set(x, y)
             sprite.anchor.set(0.5)
-            // sprite.tint = brushColor
+            sprite.tint = 0x000000
             // sprite.alpha = brushAlpha
-            sprite.scale.set(0.03)
+            sprite.scale.set(0.1)
             this.container.addChild(sprite)
 
             // this.alphaFilter.alpha = this.brush.opacity
@@ -115,5 +105,71 @@ export class BrushStroke {
 
 
         // this.lastPressure = pressure
+    }
+}
+
+export class SmoothStroke {
+    points = []
+    ignorePointThreshold = 3
+    spacing = 2
+
+    addPoint(x: number, y: number) {
+        this.points.push(new Point(x, y))
+
+        if (this.points.length === 1) {
+            const A = this.points[this.points.length - 1]
+            return this._makeDot(A)
+        }
+        if (this.points.length === 2 || this.points.length === 3) {
+            const A = this.points[this.points.length - 2]
+            const B = this.points[this.points.length - 1]
+            return this._makeLine(A, B)
+        }
+
+        const A = this.points[this.points.length - 4]
+        const B = this.points[this.points.length - 3]
+        const C = this.points[this.points.length - 2]
+        const D = this.points[this.points.length - 1]
+        return this._makeCurve(A, B, C, D)
+    }
+
+    _makeDot(point: Point) {
+        return [point]
+    }
+
+    _makeLine(A: Point, B: Point) {
+        const distance = A.distanceTo(B)
+        const steps = distance * this.spacing
+
+        const interpolatedPoints = []
+        for (let i = 0; i < steps; i++) {
+            const x = lerp(A.x, B.x, i / (steps - 1))
+            const y = lerp(A.y, B.y, i / (steps - 1))
+            interpolatedPoints.push({ x, y })
+        }
+        return interpolatedPoints
+    }
+
+    _makeCurve(A: Point, B: Point, C: Point, D: Point) {
+        const distance = B.distanceTo(C)
+        const steps = Math.floor(distance * this.spacing)
+        const interpolatedPoints = []
+        for (let i = 0; i < steps; i++) {
+            // const point = { x: lerp(B.x, C.x, i / (steps - 1)), y: lerp(B.y, C.y, i / (steps - 1)) }
+            const point = cardinalSpline(i / (steps), 0.5, A, B, C, D)
+            interpolatedPoints.push(point)
+        }
+        return interpolatedPoints
+    }
+}
+
+class Point {
+    constructor(public x: number, public y: number) {
+        this.x = x
+        this.y = y
+    }
+
+    distanceTo(point: Point) {
+        return Math.sqrt((point.x - this.x) ** 2 + (point.y - this.y) ** 2)
     }
 }
