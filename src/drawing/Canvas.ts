@@ -4,11 +4,10 @@ import { app } from './App'
 import { cardinalSpline, Easing, lerp } from './util'
 
 export class Canvas {
-    container: PIXI.Container
-    pointerDown: boolean
+    public container: PIXI.Container
     
-    brushTexture: PIXI.RenderTexture
-    liveBrushStroke: BrushStroke = new BrushStroke()
+    private liveBrushStroke: BrushStroke = new BrushStroke()
+    private pointerDown: boolean
 
     settings = {
         width: 1500,

@@ -7,7 +7,8 @@ export class ToolManager {
     private tools: Map<string, Tool> = new Map()
 
     private activeTool: Tool
-
+    private previousActiveTool: Tool
+ 
     constructor() {
         this.setupEvents()
     }
@@ -19,8 +20,16 @@ export class ToolManager {
     }
 
     selectTool(name) {
+        if (this.activeTool && this.activeTool.name !== name) {
+            this.previousActiveTool = this.activeTool
+        }
         this.activeTool = this.tools.get(name)
         this.runActiveTool(EventType.onActivate, new Event('Tool Activated'))
+    }
+
+    selectPreviousTool() {
+        console.log(this.previousActiveTool.name)
+        this.selectTool(this.previousActiveTool.name)
     }
 
     runActiveTool(eventType: EventType, event: Event) {

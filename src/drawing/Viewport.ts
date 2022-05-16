@@ -13,7 +13,6 @@ export class Viewport {
         offset: { x: 0, y: 0 }
     }
 
-    keyboard: Object = {}
 
     constructor(canvas: Canvas) {
         this.container = new PIXI.Container()
@@ -42,43 +41,42 @@ export class Viewport {
         return this.container.transform.worldTransform.applyInverse(new PIXI.Point(x, y))
     }
 
-    setupEvents() {
-        window.addEventListener('mousemove', (e) => {
-            // Keyboard Zoom
-            if (this.keyboard['z'] && e.buttons) {
-                this.navigation.scale += e.movementX / 100
-                if (this.navigation.scale > 5) this.navigation.scale = 5
-                if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
+    zoomIn() {
 
-                if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
-                if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
+    }
 
-                this.updateContainerTransform()
-            }
+    zoomOut() {
 
-            // Keyboard Pan
-            if (this.keyboard[' '] && e.buttons) {
-                this.navigation.offset.x += -e.movementX
-                this.navigation.offset.y += -e.movementY
-                this.updateContainerTransform()
-            }
-        })
-        
-        window.addEventListener('keyup', (e) => {
-            this.keyboard[e.key] = false
-        })
-        
-        window.addEventListener('keydown', (e) => {
-            this.keyboard[e.key] = true
+    }
 
-            // Keyboard Rotate
-            if (this.keyboard['ArrowLeft']) {
-                this.navigation.rotation -= 0.1
-                this.updateContainerTransform()
-            } else if (this.keyboard['ArrowRight']) {
-                this.navigation.rotation += 0.1
-                this.updateContainerTransform()
-            }
-        })
+    rotateLeft() {
+        this.navigation.rotation -= 0.1
+        this.updateContainerTransform()
+    }
+
+    rotateRight() {
+        this.navigation.rotation += 0.1
+        this.updateContainerTransform()
+    }
+
+    zoom(e: PointerEvent) {
+        this.navigation.scale += e.movementX / 100
+        if (this.navigation.scale > 5) this.navigation.scale = 5
+        if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
+
+        if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+        if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
+
+        this.updateContainerTransform()
+    }
+
+    pan(e: PointerEvent) {
+        this.navigation.offset.x += -e.movementX
+        this.navigation.offset.y += -e.movementY
+        this.updateContainerTransform()
+    }
+
+    rotate() {
+
     }
 }

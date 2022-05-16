@@ -1,4 +1,4 @@
-import type { Action } from "./Action"
+import type { Action } from "./Actions"
 import { app } from "./App"
 
 export class ActionManager {
@@ -14,24 +14,28 @@ export class ActionManager {
     }
 
     setupEvents() {
-        app.ref.addEventListener('pointerdown', (e) => {
+        // app.ref.addEventListener('pointerdown', (e) => {
 
-        })
-        app.ref.addEventListener('pointerup', () => {
+        // })
+        // app.ref.addEventListener('pointerup', () => {
 
-        })
-        app.ref.addEventListener('pointermove', (e) => {
+        // })
+        // app.ref.addEventListener('pointermove', (e) => {
 
-        })
+        // })
         window.addEventListener('keyup', (e) => {
             this.keyboard[e.key] = false
+
+            this.actions.forEach(action => {
+                action.onUp(this.keyboard)
+            })
         })
         
         window.addEventListener('keydown', (e) => {
             this.keyboard[e.key] = true
 
             this.actions.forEach(action => {
-                action.match(this.keyboard)
+                action.onDown(this.keyboard)
             })
         })
     }
