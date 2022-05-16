@@ -42,11 +42,32 @@ export class Viewport {
     }
 
     zoomIn() {
+        this.navigation.scale += 0.1
+        this.zoomChecks()        
 
+        this.updateContainerTransform()
     }
 
     zoomOut() {
+        this.navigation.scale -= 0.1
+        this.zoomChecks()        
 
+        this.updateContainerTransform()
+    }
+
+    zoom(e: PointerEvent) {
+        this.navigation.scale += e.movementX / 100
+        this.zoomChecks()        
+
+        this.updateContainerTransform()
+    }
+
+    private zoomChecks() {
+        if (this.navigation.scale > 5) this.navigation.scale = 5
+        if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
+
+        if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+        if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
     }
 
     rotateLeft() {
@@ -59,24 +80,13 @@ export class Viewport {
         this.updateContainerTransform()
     }
 
-    zoom(e: PointerEvent) {
-        this.navigation.scale += e.movementX / 100
-        if (this.navigation.scale > 5) this.navigation.scale = 5
-        if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
+    rotate() {
 
-        if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
-        if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
-
-        this.updateContainerTransform()
     }
 
     pan(e: PointerEvent) {
         this.navigation.offset.x += -e.movementX
         this.navigation.offset.y += -e.movementY
         this.updateContainerTransform()
-    }
-
-    rotate() {
-
     }
 }
