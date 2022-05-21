@@ -4,10 +4,13 @@ import { app } from './App'
 import { cardinalSpline, Easing, lerp } from './util'
 
 export class Canvas {
-    public container: PIXI.Container
+    public container: PIXI.Container = new PIXI.Container()
     
     private liveBrushStroke: BrushStroke = new BrushStroke()
     private pointerDown: boolean
+
+    private undoStack: Array<PIXI.Sprite> = []
+    private redoStack: Array<PIXI.Sprite> = []
 
     settings = {
         width: 1500,
@@ -16,16 +19,40 @@ export class Canvas {
     }
 
     constructor() {
-        this.container = new PIXI.Container()
-
         const background = new PIXI.Graphics()
             .beginFill(this.settings.backgroundColor)
             .drawRect(0, 0, this.settings.width, this.settings.height)
             .endFill()
         this.container.addChild(background)
+
+        this.endBrushStroke(null)
     }
 
-    startBrushStroke(e: PointerEvent) {
+    undo() {
+        if (this.undoStack.length <= 1) return
+
+        const currentCanvasSprite = this.undoStack.pop()
+        this.redoStack.push(currentCanvasSprite)
+
+        this.container.removeChildren()
+        this.container.addChild(this.undoStack.at(-1))
+
+        console.log({ u: this.undoStack, r: this.redoStack })
+    }
+
+    redo() {
+        if (!this.redoStack.length) return
+
+        const canvasSprite = this.redoStack.pop()
+        this.undoStack.push(canvasSprite)
+
+        this.container.removeChildren()
+        this.container.addChild(canvasSprite)
+
+        console.log({ u: this.undoStack, r: this.redoStack })
+    }
+
+    startBrushStroke(_: PointerEvent) {
         this.pointerDown = true
 
         this.liveBrushStroke = new BrushStroke()
@@ -42,7 +69,7 @@ export class Canvas {
         }
     }
 
-    endBrushStroke(e: PointerEvent) {
+    endBrushStroke(_: PointerEvent) {
         this.pointerDown = false
 
         const canvasTexture = PIXI.RenderTexture.create({
@@ -55,6 +82,10 @@ export class Canvas {
         this.container.removeChildren()
 
         this.container.addChild(canvasSprite)
+        this.undoStack.push(canvasSprite)
+        this.redoStack = []
+
+        console.log({ u: this.undoStack, r: this.redoStack })
     }
 }
 

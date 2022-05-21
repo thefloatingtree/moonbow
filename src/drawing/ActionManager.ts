@@ -24,7 +24,7 @@ export class ActionManager {
 
         // })
         window.addEventListener('keyup', (e) => {
-            this.keyboard[e.key] = false
+            this.keyboard[e.key.toLowerCase()] = false
 
             this.actions.forEach(action => {
                 action.onUp(this.keyboard)
@@ -32,7 +32,7 @@ export class ActionManager {
         })
         
         window.addEventListener('keydown', (e) => {
-            this.keyboard[e.key] = true
+            this.keyboard[e.key.toLowerCase()] = true
 
             this.actions.forEach(action => {
                 action.onDown(this.keyboard)

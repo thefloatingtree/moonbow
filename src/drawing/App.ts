@@ -47,17 +47,20 @@ export class App {
         this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool('zoom')))
         this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
         // rotate
-        this.actionManager.addAction(new OnUpTriggerAction(['ArrowLeft'], () => this.viewport.rotateLeft()))
-        this.actionManager.addAction(new OnUpTriggerAction(['ArrowRight'], () => this.viewport.rotateRight()))
+        this.actionManager.addAction(new OnUpTriggerAction(['arrowleft'], () => this.viewport.rotateLeft()))
+        this.actionManager.addAction(new OnUpTriggerAction(['arrowright'], () => this.viewport.rotateRight()))
         // tools
         this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool('brush')))
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool('eraser')))
+        // undo/redo
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.canvas.undo()))
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.canvas.redo()))
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.canvas.redo()))
     }
 
     addTools() {
 
         // navigation
-
         this.toolManager.addTool('pan')
             .onMouseMove((e) => {
                 if (e.buttons) {
@@ -71,7 +74,7 @@ export class App {
                 }
             })
 
-
+        // painting
         this.toolManager.addTool('brush')
             .onActivate(() => {
                 console.log("Brush")
