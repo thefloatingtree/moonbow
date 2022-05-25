@@ -11,10 +11,10 @@ export class Canvas {
 
     private undoStack: Array<PIXI.Sprite> = []
     private redoStack: Array<PIXI.Sprite> = []
-
+ 
     settings = {
-        width: 1500,
-        height: 1500,
+        width: 500,
+        height: 500,
         backgroundColor: 0xFFFFFF
     }
 

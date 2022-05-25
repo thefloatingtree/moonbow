@@ -13,7 +13,6 @@ export class Viewport {
         offset: { x: 0, y: 0 }
     }
 
-
     constructor(canvas: Canvas) {
         this.container = new PIXI.Container()
         this.canvas = canvas
@@ -25,15 +24,15 @@ export class Viewport {
 
     private updateContainerTransform() {
         this.container.setTransform(
-            app.application.screen.width / 2, 
-            app.application.screen.height / 2,
+            app.application.screen.width / 2 - this.navigation.offset.x, 
+            app.application.screen.height / 2 - this.navigation.offset.y,
             this.navigation.scale, 
             this.navigation.scale,
             this.navigation.rotation,
             0, 
             0,
-            this.canvas.settings.width / 2 + (this.navigation.offset.x / this.navigation.scale),
-            this.canvas.settings.height / 2 + (this.navigation.offset.y / this.navigation.scale)
+            this.canvas.settings.width / 2,
+            this.canvas.settings.height / 2
         )
     }
 
