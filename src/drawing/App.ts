@@ -2,8 +2,9 @@ import * as PIXI from 'pixi.js'
 import { OnDownTriggerAction, OnHoldReleaseTriggerAction, OnUpTriggerAction } from './Actions'
 import { ActionManager } from './ActionManager'
 import { Canvas } from './Canvas'
-import { ToolManager } from './ToolManager'
+import { ToolManager } from './Tools/ToolManager'
 import { Viewport } from './Viewport'
+import { ToolType } from './Tools/ToolTypes'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -12,6 +13,8 @@ export class App {
     public viewport: Viewport
     public actionManager: ActionManager
     public toolManager: ToolManager
+
+    private afterInitCallbacks: Array<Function> = []
 
     init(ref: HTMLCanvasElement) {
         this.ref = ref
@@ -23,7 +26,7 @@ export class App {
         PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
         PIXI.utils.skipHello()
 
-        this.application = new PIXI.Application({ view: this.ref, backgroundColor: 0x333333, resizeTo: window, antialias: true })
+        this.application = new PIXI.Application({ view: this.ref, backgroundColor: 0x3E3E46, resizeTo: window, antialias: true })
 
         this.canvas = new Canvas()
         this.viewport = new Viewport(this.canvas)
@@ -36,38 +39,44 @@ export class App {
         this.application.stage.addChild(this.viewport.container)
 
         this.application.start()
+
+        this.afterInitCallbacks.forEach(fn => fn())
     }
 
-    addActions() {
+    onAfterInit(fn: Function) {
+        this.afterInitCallbacks.push(fn)
+    }
+
+    private addActions() {
         // navigation
         // pan
-        this.actionManager.addAction(new OnDownTriggerAction([' '], () => this.toolManager.selectTool('pan')))
+        this.actionManager.addAction(new OnDownTriggerAction([' '], () => this.toolManager.selectTool(ToolType.Pan)))
         this.actionManager.addAction(new OnUpTriggerAction([' '], () => this.toolManager.selectPreviousTool()))
         // zoom
-        this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool('zoom')))
+        this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
         this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
         // rotate
-        this.actionManager.addAction(new OnUpTriggerAction(['arrowleft'], () => this.viewport.rotateLeft()))
-        this.actionManager.addAction(new OnUpTriggerAction(['arrowright'], () => this.viewport.rotateRight()))
+        this.actionManager.addAction(new OnDownTriggerAction(['arrowleft'], () => this.viewport.rotateLeft()))
+        this.actionManager.addAction(new OnDownTriggerAction(['arrowright'], () => this.viewport.rotateRight()))
         // tools
-        this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool('brush')))
-        this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool('eraser')))
+        this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool(ToolType.Brush)))
+        this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
         // undo/redo
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.canvas.undo()))
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.canvas.redo()))
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.canvas.redo()))
     }
 
-    addTools() {
+    private addTools() {
 
         // navigation
-        this.toolManager.addTool('pan')
+        this.toolManager.addTool(ToolType.Pan)
             .onMouseMove((e) => {
                 if (e.buttons) {
                     app.viewport.pan(e)
                 }
             })
-        this.toolManager.addTool('zoom')
+        this.toolManager.addTool(ToolType.Zoom)
             .onMouseMove((e) => {
                 if (e.buttons) {
                     app.viewport.zoom(e)
@@ -75,7 +84,7 @@ export class App {
             })
 
         // painting
-        this.toolManager.addTool('brush')
+        this.toolManager.addTool(ToolType.Brush)
             .onActivate(() => {
                 console.log("Brush")
             })
@@ -88,12 +97,12 @@ export class App {
             .onMouseUp((e: PointerEvent) => {
                 app.canvas.endBrushStroke(e)
             })
-        this.toolManager.addTool('eraser')
+        this.toolManager.addTool(ToolType.Eraser)
             .onActivate(() => {
                 console.log("Eraser")
             })
 
-        this.toolManager.selectTool('brush')
+        this.toolManager.selectTool(ToolType.Brush)
     }
 }
 

@@ -41,7 +41,7 @@ export class OnHoldReleaseTriggerAction extends Action {
     private timer: NodeJS.Timeout
     private shouldRunAction: boolean = false
     private held: boolean = false
-    private holdTime: number = 500
+    private holdTime: number = 200
 
     onDown(keyboard: Object) {
         if (this.held) return

@@ -1,34 +1,46 @@
-import { app } from "./App"
+import { app } from "../App"
 import { EventType, Tool } from "./Tool"
+import type { ToolType } from "./ToolTypes"
 
 export class ToolManager {
 
     private keyboard: Object = {}
-    private tools: Map<string, Tool> = new Map()
+    private tools: Map<ToolType, Tool> = new Map()
 
     private activeTool: Tool
     private previousActiveTool: Tool
+
+    private selectToolCallbacks: Array<(type: ToolType) => any> = []
  
     constructor() {
         this.setupEvents()
     }
 
-    addTool(name) {
+    addTool(name: ToolType) {
         const tool = new Tool(name)
         this.tools.set(name, tool)
         return tool
     }
-
-    selectTool(name) {
+ 
+    selectTool(name: ToolType) {
         if (this.activeTool && this.activeTool.name !== name) {
             this.previousActiveTool = this.activeTool
         }
         this.activeTool = this.tools.get(name)
         this.runActiveTool(EventType.onActivate, new Event('Tool Activated'))
+
+        this.selectToolCallbacks.forEach(fn => fn(name))
+    }
+ 
+    onSelectTool(fn: (type: ToolType) => any) {
+        this.selectToolCallbacks.push(fn)
+    }
+
+    selectedTool(): ToolType {
+        return this.activeTool.name;
     }
 
     selectPreviousTool() {
-        console.log(this.previousActiveTool.name)
         this.selectTool(this.previousActiveTool.name)
     }
 

@@ -17,19 +17,19 @@ export class Viewport {
         this.container = new PIXI.Container()
         this.canvas = canvas
 
-        this.container.addChild(this.canvas.container) 
+        this.container.addChild(this.canvas.container)
 
         this.container.setTransform(app.application.screen.width / 2, app.application.screen.height / 2, 1, 1, 0, 0, 0, this.canvas.settings.width / 2, this.canvas.settings.height / 2)
     }
 
     private updateContainerTransform() {
         this.container.setTransform(
-            app.application.screen.width / 2 - this.navigation.offset.x, 
+            app.application.screen.width / 2 - this.navigation.offset.x,
             app.application.screen.height / 2 - this.navigation.offset.y,
-            this.navigation.scale, 
+            this.navigation.scale,
             this.navigation.scale,
             this.navigation.rotation,
-            0, 
+            0,
             0,
             this.canvas.settings.width / 2,
             this.canvas.settings.height / 2
@@ -42,21 +42,21 @@ export class Viewport {
 
     zoomIn() {
         this.navigation.scale += 0.1
-        this.zoomChecks()        
+        this.zoomChecks()
 
         this.updateContainerTransform()
     }
 
     zoomOut() {
         this.navigation.scale -= 0.1
-        this.zoomChecks()        
+        this.zoomChecks()
 
         this.updateContainerTransform()
     }
 
     zoom(e: PointerEvent) {
         this.navigation.scale += e.movementX / 100
-        this.zoomChecks()        
+        this.zoomChecks()
 
         this.updateContainerTransform()
     }

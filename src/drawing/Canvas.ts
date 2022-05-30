@@ -5,13 +5,13 @@ import { cardinalSpline, Easing, lerp } from './util'
 
 export class Canvas {
     public container: PIXI.Container = new PIXI.Container()
-    
+
     private liveBrushStroke: BrushStroke = new BrushStroke()
     private pointerDown: boolean
 
     private undoStack: Array<PIXI.Sprite> = []
     private redoStack: Array<PIXI.Sprite> = []
- 
+
     settings = {
         width: 500,
         height: 500,
@@ -78,7 +78,7 @@ export class Canvas {
         })
         app.application.renderer.render(this.container, { renderTexture: canvasTexture })
         const canvasSprite = new PIXI.Sprite(canvasTexture)
-        
+
         this.container.removeChildren()
 
         this.container.addChild(canvasSprite)
@@ -103,7 +103,7 @@ export class BrushStroke {
 
             // const interpolatedPressure = lerp(this.lastPressure, pressure, i / points.length)
             // const actualPressure = points.length === 1 ? pressure : interpolatedPressure
-            
+
             // const opacityPressure = this.brush.opacityPressure ? actualPressure : 1
             // const sizePressure = this.brush.sizePressure ? actualPressure : 1
 
@@ -124,50 +124,33 @@ export class BrushStroke {
             // this.container.filters = [this.alphaFilter]
         }
 
-        
-
-        // const temp = new PIXI.Graphics()
-        //     .beginFill(0x000000)
-        //     .drawPolygon(points.map(([x, y]) => new PIXI.Point(x, y)))
-        //     .endFill()
-
-        // this.container.addChild(temp)
-
-
         // this.lastPressure = pressure
     }
 }
 
 export class SmoothStroke {
-    points = []
-    ignorePointThreshold = 3
-    spacing = 2
+    private points = []
+    private spacing = 2
 
     addPoint(x: number, y: number) {
         this.points.push(new Point(x, y))
 
-        if (this.points.length === 1) {
-            const A = this.points[this.points.length - 1]
-            return this._makeDot(A)
-        }
-        if (this.points.length === 2 || this.points.length === 3) {
-            const A = this.points[this.points.length - 2]
-            const B = this.points[this.points.length - 1]
-            return this._makeLine(A, B)
-        }
+        const A = this.points.at(-1)
+        const B = this.points.at(-2)
+        const C = this.points.at(-3)
+        const D = this.points.at(-4)
 
-        const A = this.points[this.points.length - 4]
-        const B = this.points[this.points.length - 3]
-        const C = this.points[this.points.length - 2]
-        const D = this.points[this.points.length - 1]
-        return this._makeCurve(A, B, C, D)
+        if (this.points.length === 1) return this.dot(A)
+        if (this.points.length === 2 || this.points.length === 3) return this.line(A, B)
+
+        return this.curve(A, B, C, D)
     }
 
-    _makeDot(point: Point) {
+    private dot(point: Point) {
         return [point]
     }
 
-    _makeLine(A: Point, B: Point) {
+    private line(A: Point, B: Point) {
         const distance = A.distanceTo(B)
         const steps = distance * this.spacing
 
@@ -180,7 +163,7 @@ export class SmoothStroke {
         return interpolatedPoints
     }
 
-    _makeCurve(A: Point, B: Point, C: Point, D: Point) {
+    private curve(A: Point, B: Point, C: Point, D: Point) {
         const distance = B.distanceTo(C)
         const steps = Math.floor(distance * this.spacing)
         const interpolatedPoints = []
@@ -194,10 +177,10 @@ export class SmoothStroke {
 }
 
 class Point {
-    constructor(public x: number, public y: number) {
-        this.x = x
-        this.y = y
-    }
+    constructor(
+        public x: number,
+        public y: number
+    ) { }
 
     distanceTo(point: Point) {
         return Math.sqrt((point.x - this.x) ** 2 + (point.y - this.y) ** 2)

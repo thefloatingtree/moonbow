@@ -1,3 +1,5 @@
+import type { ToolType } from "./ToolTypes"
+
 export enum EventType {
     onMouseDown,
     onMouseUp,
@@ -11,7 +13,7 @@ export class Tool {
 
     actions: Array<{ event: EventType, action: Function }> = []
 
-    constructor(public name: String) {}
+    constructor(public name: ToolType) {}
 
     onMouseDown(action: Function): Tool {
         this.actions.push({ event: EventType.onMouseDown, action })
