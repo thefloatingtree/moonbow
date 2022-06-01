@@ -1098,6 +1098,11 @@ svelte-icons@^2.1.0:
   resolved "https://registry.yarnpkg.com/svelte-icons/-/svelte-icons-2.1.0.tgz#6f2ec72f1d5c8b2de1a4b8a822c95bcb2f701aca"
   integrity sha512-rHPQjweEc9fGSnvM0/4gA3pDHwyZyYsC5KhttCZRhSMJfLttJST5Uq0B16Czhw+HQ+HbSOk8kLigMlPs7gZtfg==
 
+svelte-outside-click@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/svelte-outside-click/-/svelte-outside-click-1.1.1.tgz#74ac668dc7e3def216fab7f8bd421e37284e7c1a"
+  integrity sha512-ndkeLX+U5kiENRgzunLOW7wJlYmV+iNRQ0oNamM7lUoHdr68SM2LkFFWrrSfBWlnFaGEvo0PkVXGOU1xzdrIdg==
+
 svelte-preprocess@^4.0.0, svelte-preprocess@^4.10.5:
   version "4.10.6"
   resolved "https://registry.yarnpkg.com/svelte-preprocess/-/svelte-preprocess-4.10.6.tgz#5f9a53e7ed3b85fc7e0841120c725b76ac5a1ba8"
