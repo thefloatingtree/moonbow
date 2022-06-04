@@ -56,6 +56,8 @@ export class App {
         this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
         this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
         // rotate
+        this.actionManager.addAction(new OnDownTriggerAction(['r'], () => this.toolManager.selectTool(ToolType.Rotate)))
+        this.actionManager.addAction(new OnHoldReleaseTriggerAction(['r'], () => this.toolManager.selectPreviousTool()))
         this.actionManager.addAction(new OnDownTriggerAction(['arrowleft'], () => this.viewport.rotateLeft()))
         this.actionManager.addAction(new OnDownTriggerAction(['arrowright'], () => this.viewport.rotateRight()))
         // tools
@@ -77,10 +79,33 @@ export class App {
                 }
             })
         this.toolManager.addTool(ToolType.Zoom)
+            .onMouseDown((e) => {
+                app.viewport.scrubbyZoomStart(e)
+            })
             .onMouseMove((e) => {
                 if (e.buttons) {
-                    app.viewport.zoom(e)
+                    app.viewport.scrubbyZoomUpdate(e)
                 }
+            })
+            .onMouseUp((e) => {
+                app.viewport.scrubbyZoomEnd(e)
+            })
+
+        this.toolManager.addTool(ToolType.WheelZoom, true)
+            .onWheel((e: WheelEvent) => {
+                app.viewport.wheelZoom(e)
+            })
+        this.toolManager.addTool(ToolType.Rotate)
+            .onMouseDown((e) => {
+                app.viewport.scrubbyRotateStart(e)
+            })
+            .onMouseMove((e) => {
+                if (e.buttons) {
+                    app.viewport.scrubbyRotateUpdate(e)
+                }
+            })
+            .onMouseUp((e) => {
+                app.viewport.scrubbyRotateEnd(e)
             })
 
         // painting

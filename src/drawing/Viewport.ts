@@ -1,91 +1,154 @@
 import * as PIXI from 'pixi.js'
 import { app } from './App'
 import type { Canvas } from './Canvas'
+import { distance } from './util'
 
 export class Viewport {
 
     container: PIXI.Container
-    canvas: Canvas
+    private canvas: Canvas
 
-    navigation = {
-        scale: 1,
-        rotation: 0,
-        offset: { x: 0, y: 0 }
-    }
+    private scrubbyZoomInitialPoint: { x: number, y: number } = null
+    private scrubbyRotateInitialPoint: { x: number, y: number } = null
+    private scrubbyRotateInitialRotation: number = null
+    private scrubbyRotateInitialCircularRotation: number = null
+
+    private circularRotation: number = 0
 
     constructor(canvas: Canvas) {
         this.container = new PIXI.Container()
         this.canvas = canvas
 
+        this.container.x = app.application.screen.width / 2
+        this.container.y = app.application.screen.height / 2
+
+        this.container.pivot.x = this.canvas.settings.width / 2
+        this.container.pivot.y = this.canvas.settings.height / 2
+
         this.container.addChild(this.canvas.container)
 
-        this.container.setTransform(app.application.screen.width / 2, app.application.screen.height / 2, 1, 1, 0, 0, 0, this.canvas.settings.width / 2, this.canvas.settings.height / 2)
+        this.updateMask()
     }
 
-    private updateContainerTransform() {
-        this.container.setTransform(
-            app.application.screen.width / 2 - this.navigation.offset.x,
-            app.application.screen.height / 2 - this.navigation.offset.y,
-            this.navigation.scale,
-            this.navigation.scale,
-            this.navigation.rotation,
-            0,
-            0,
-            this.canvas.settings.width / 2,
-            this.canvas.settings.height / 2
-        )
+    convertScreenToCanvas(x: number, y: number) {
+        return this.container.worldTransform.applyInverse(new PIXI.Point(x, y))
     }
 
-    convertScreenToCanvas(x, y) {
-        return this.container.transform.worldTransform.applyInverse(new PIXI.Point(x, y))
+    rotateBy(radians: number) {
+        this.rotateTo(this.circularRotation + radians, this.container.rotation + radians)
     }
 
-    zoomIn() {
-        this.navigation.scale += 0.1
-        this.zoomChecks()
+    rotateTo(circularRotationRadians: number, rotationRadians: number) {
+        this.circularRotation = circularRotationRadians
 
-        this.updateContainerTransform()
+        const pivot = { x: app.application.screen.width / 2, y: app.application.screen.height / 2 }
+        const canvasCenter = this.container.toGlobal(this.container.pivot)
+
+        const radius = distance(pivot.x, pivot.y, canvasCenter.x, canvasCenter.y)
+
+        const newPosition = { 
+            x: radius * Math.cos(this.circularRotation) + pivot.x, 
+            y: radius * Math.sin(this.circularRotation) + pivot.y 
+        }
+
+        this.container.position.x = newPosition.x
+        this.container.position.y = newPosition.y
+
+        this.container.rotation = rotationRadians
+
+        this.updateMask()
     }
 
-    zoomOut() {
-        this.navigation.scale -= 0.1
-        this.zoomChecks()
-
-        this.updateContainerTransform()
+    scrubbyRotateStart(e: MouseEvent) {
+        this.scrubbyRotateInitialPoint = { x: e.x, y: e.y }
+        this.scrubbyRotateInitialRotation = this.container.rotation
+        this.scrubbyRotateInitialCircularRotation = this.circularRotation
     }
 
-    zoom(e: PointerEvent) {
-        this.navigation.scale += e.movementX / 100
-        this.zoomChecks()
-
-        this.updateContainerTransform()
+    scrubbyRotateUpdate(e: MouseEvent) {
+        const pivot = { x: app.application.screen.width / 2, y: app.application.screen.height / 2 }
+        const rotationDelta = Math.atan2(e.y - pivot.y, e.x - pivot.x) - Math.atan2(this.scrubbyRotateInitialPoint.y - pivot.y, this.scrubbyRotateInitialPoint.x - pivot.x)
+        this.rotateTo(this.scrubbyRotateInitialCircularRotation + rotationDelta, this.scrubbyRotateInitialRotation + rotationDelta)
     }
 
-    private zoomChecks() {
-        if (this.navigation.scale > 5) this.navigation.scale = 5
-        if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
-
-        if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
-        if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
-    }
-
-    rotateLeft() {
-        this.navigation.rotation -= 0.1
-        this.updateContainerTransform()
+    scrubbyRotateEnd(e: MouseEvent) {
+        this.scrubbyRotateInitialPoint = null
+        this.scrubbyRotateInitialRotation = null
+        this.scrubbyRotateInitialCircularRotation = null
     }
 
     rotateRight() {
-        this.navigation.rotation += 0.1
-        this.updateContainerTransform()
+        this.rotateBy(10 * PIXI.DEG_TO_RAD)
     }
 
-    rotate() {
+    rotateLeft() {
+        this.rotateBy(-10 * PIXI.DEG_TO_RAD)
+    }
 
+    zoomToPoint(x: number, y: number, scale: number) {
+        const worldPos = { x: (x - this.container.x) / this.container.scale.x, y: (y - this.container.y) / this.container.scale.y }
+        const newScreenPos = { x: worldPos.x * scale + this.container.x, y: worldPos.y * scale + this.container.y }
+
+        this.container.x -= newScreenPos.x - x
+        this.container.y -= newScreenPos.y - y
+        this.container.scale.x = scale
+        this.container.scale.y = scale
+ 
+
+        this.updateRotation()
+        this.updateMask()
+    }
+
+    wheelZoom(e: WheelEvent) {
+        const scale = this.container.scale.x + (-e.deltaY / 1000) * this.container.scale.x
+        this.zoomToPoint(e.x, e.y, scale)
+    }
+
+    scrubbyZoomStart(e: PointerEvent) {
+        this.scrubbyZoomInitialPoint = { x: e.x, y: e.y }
+    }
+
+    scrubbyZoomUpdate(e: PointerEvent) {
+        const scale = this.container.scale.x + (e.movementX / 200) * this.container.scale.x
+        this.zoomToPoint(this.scrubbyZoomInitialPoint.x, this.scrubbyZoomInitialPoint.y, scale)
+    }
+
+    scrubbyZoomEnd(e: PointerEvent) {
+        this.scrubbyZoomInitialPoint = null
     }
 
     pan(e: PointerEvent) {
-        this.navigation.offset.x += -e.movementX
-        this.navigation.offset.y += -e.movementY
-        this.updateContainerTransform()
+        this.container.x += e.movementX
+        this.container.y += e.movementY
+
+        this.updateRotation()
+        this.updateMask()
     }
+
+    private updateRotation() {
+        const pivot = { x: app.application.screen.width / 2, y: app.application.screen.height / 2 }
+        const canvasCenter = this.container.toGlobal(this.container.pivot)
+
+        this.circularRotation = Math.atan2(canvasCenter.y - pivot.y, canvasCenter.x - pivot.x)
+    }
+
+    private updateMask() {
+        const mask = new PIXI.Graphics()
+            .beginFill(0xFF0000)
+            .drawRect(0, 0, app.canvas.settings.width, app.canvas.settings.height)
+            .endFill()
+
+        this.container.transform.updateTransform(app.application.stage.transform)
+        mask.transform.setFromMatrix(this.container.transform.worldTransform)
+
+        this.container.mask = mask
+    }
+
+    // private applyZoomConstraints() {
+    //     if (this.navigation.scale > 5) this.navigation.scale = 5
+    //     if (this.navigation.scale <= 0.01) this.navigation.scale = 0.01
+
+    //     if (this.navigation.scale >= 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+    //     if (this.navigation.scale < 3) PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
+    // }
 }

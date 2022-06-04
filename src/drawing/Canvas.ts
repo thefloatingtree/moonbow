@@ -1,4 +1,3 @@
-import getStroke, { getStrokePoints } from 'perfect-freehand'
 import * as PIXI from 'pixi.js'
 import { app } from './App'
 import { cardinalSpline, Easing, lerp } from './util'
@@ -6,7 +5,7 @@ import { cardinalSpline, Easing, lerp } from './util'
 export class Canvas {
     public container: PIXI.Container = new PIXI.Container()
 
-    private liveBrushStroke: BrushStroke = new BrushStroke()
+    private liveBrushStroke: BrushStroke
     private pointerDown: boolean
 
     private undoStack: Array<PIXI.Sprite> = []
@@ -72,6 +71,8 @@ export class Canvas {
     endBrushStroke(_: PointerEvent) {
         this.pointerDown = false
 
+        // this.container.children.mask = null
+
         const canvasTexture = PIXI.RenderTexture.create({
             width: this.settings.width,
             height: this.settings.height
@@ -84,8 +85,6 @@ export class Canvas {
         this.container.addChild(canvasSprite)
         this.undoStack.push(canvasSprite)
         this.redoStack = []
-
-        console.log({ u: this.undoStack, r: this.redoStack })
     }
 }
 

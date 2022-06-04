@@ -6,26 +6,27 @@ export enum EventType {
     onMouseMove,
     onKeyboardUp,
     onKeyboardDown,
-    onActivate
+    onActivate,
+    onWheel
 }
 
 export class Tool {
 
     actions: Array<{ event: EventType, action: Function }> = []
 
-    constructor(public name: ToolType) {}
+    constructor(public name: ToolType, public alwaysActive: boolean) {}
 
-    onMouseDown(action: Function): Tool {
+    onMouseDown(action: (e: PointerEvent) => any): Tool {
         this.actions.push({ event: EventType.onMouseDown, action })
         return this
     }
 
-    onMouseUp(action: Function): Tool {
+    onMouseUp(action: (e: PointerEvent) => any): Tool {
         this.actions.push({ event: EventType.onMouseUp, action })
         return this
     }
 
-    onMouseMove(action: Function): Tool {
+    onMouseMove(action: (e: PointerEvent) => any): Tool {
         this.actions.push({ event: EventType.onMouseMove, action })
         return this
     }
@@ -42,6 +43,11 @@ export class Tool {
 
     onActivate(action: Function): Tool {
         this.actions.push({ event: EventType.onActivate, action })
+        return this
+    }
+
+    onWheel(action: Function): Tool {
+        this.actions.push({ event: EventType.onWheel, action })
         return this
     }
 }

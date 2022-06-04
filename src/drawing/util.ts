@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js'
+
 // https://easings.net/
 export const Easing = {
     linear: x => x,
@@ -53,4 +55,68 @@ export function cardinalSpline(t: number, L: number, p1: { x: number, y: number 
     const x = (2 * t ** 3 - 3 * t ** 2 + 1) * p2.x + (-2 * t ** 3 + 3 * t ** 2) * p3.x + (t ** 3 - 2 * t ** 2 + t) * L * (p3.x - p1.x) + (t ** 3 - t ** 2) * L * (p4.x - p2.x)
     const y = (2 * t * t * t - 3 * t * t + 1) * p2.y + (-2 * t * t * t + 3 * t * t) * p3.y + (t * t * t - 2 * t * t + t) * L * (p3.y - p1.y) + (t * t * t - t * t) * L * (p4.y - p2.y)
     return { x, y }
+}
+
+export function magnitude(x: number, y: number): number {
+    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
+}
+
+export function distance(x1: number, y1: number, x2: number, y2: number){
+    let y = x2 - x1;
+    let x = y2 - y1;
+    
+    return Math.sqrt(x * x + y * y);
+}
+
+export class Matrix extends PIXI.Matrix {
+
+    static CreateTranslation(x: number, y: number): Matrix {
+        const matrix = new Matrix()
+        if (x === 0 && y === 0) return matrix
+
+        matrix.tx = x
+        matrix.ty = y
+
+        return matrix
+    }
+
+    static CreateRotation(radians: number, pivotX: number, pivotY: number): Matrix {
+        const matrix = new Matrix()
+
+        if (radians === 0) return matrix
+
+        const sin = Math.sin(radians)
+        const cos = Math.cos(radians)
+
+        const onMinusCos = 1 - cos
+
+        matrix.a = cos
+        matrix.b = sin
+        matrix.c = -sin
+        matrix.d = cos
+        matrix.tx = this.Dot(sin, pivotY, onMinusCos, pivotX)
+        matrix.ty = this.Dot(-sin, pivotX, onMinusCos, pivotY)
+
+        return matrix
+    }
+
+    static CreateScale(scaleX: number, scaleY: number, pivotX: number, pivotY: number): Matrix {
+        const matrix = new Matrix()
+
+        if (scaleX === 1 && scaleY === 1) return matrix
+
+        const tx = pivotX - scaleX * pivotX
+        const ty = pivotY - scaleY * pivotY
+
+        matrix.a = scaleX
+        matrix.d = scaleY
+        matrix.tx = tx
+        matrix.ty = ty
+        
+        return matrix
+    }
+
+    static Dot(a: number, b: number, c: number, d: number): number {
+        return a * b + c * d
+    }
 }

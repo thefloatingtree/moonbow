@@ -16,8 +16,8 @@ export class ToolManager {
         this.setupEvents()
     }
 
-    addTool(name: ToolType) {
-        const tool = new Tool(name)
+    addTool(name: ToolType, alwaysActive: boolean = false) {
+        const tool = new Tool(name, alwaysActive)
         this.tools.set(name, tool)
         return tool
     }
@@ -45,9 +45,13 @@ export class ToolManager {
     }
 
     runActiveTool(eventType: EventType, event: Event) {
-        this.activeTool?.actions.forEach(action => {
-            if (action.event == eventType) {
-                action.action(event)
+        this.tools.forEach(tool => {
+            if (tool.name === this.activeTool?.name || tool.alwaysActive) {
+                tool.actions.forEach(action => {
+                    if (action.event == eventType) {
+                        action.action(event)
+                    }
+                })
             }
         })
     }
@@ -66,10 +70,12 @@ export class ToolManager {
             this.keyboard[e.key] = false
             this.runActiveTool(EventType.onKeyboardUp, e)
         })
-
         window.addEventListener('keydown', (e) => {
             this.keyboard[e.key] = true
             this.runActiveTool(EventType.onKeyboardDown, e)
+        })
+        window.addEventListener('wheel', (e) => {
+            this.runActiveTool(EventType.onWheel, e)
         })
     }
 }

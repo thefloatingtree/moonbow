@@ -4,5 +4,6 @@ export enum ToolType {
     Select,
     Pan,
     Zoom,
+    WheelZoom,
     Rotate,
 }
