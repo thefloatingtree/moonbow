@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
-import { OnDownTriggerAction, OnHoldReleaseTriggerAction, OnUpTriggerAction } from './Actions'
-import { ActionManager } from './ActionManager'
-import { Canvas } from './Canvas'
+import { OnDownTriggerAction, OnHoldReleaseTriggerAction, OnUpTriggerAction } from './Actions/Actions'
+import { ActionManager } from './Actions/ActionManager'
+import { Canvas } from './Canvas/Canvas'
 import { ToolManager } from './Tools/ToolManager'
 import { Viewport } from './Viewport'
 import { ToolType } from './Tools/ToolTypes'
@@ -52,6 +52,9 @@ export class App {
         // pan
         this.actionManager.addAction(new OnDownTriggerAction([' '], () => this.toolManager.selectTool(ToolType.Pan)))
         this.actionManager.addAction(new OnUpTriggerAction([' '], () => this.toolManager.selectPreviousTool()))
+        this.actionManager.addAction(new OnDownTriggerAction(['mousemiddle'], () => this.toolManager.selectTool(ToolType.Pan)))
+        this.actionManager.addAction(new OnUpTriggerAction(['mousemiddle'], () => this.toolManager.selectPreviousTool()))
+
         // zoom
         this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
         this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
@@ -114,13 +117,13 @@ export class App {
                 console.log("Brush")
             })
             .onMouseDown((e: PointerEvent) => {
-                app.canvas.startBrushStroke(e)
+                if (e.button === 0) app.canvas.startBrushStroke(e)
             })
             .onMouseMove((e: PointerEvent) => {
                 app.canvas.updateBrushStroke(e)
-            })
+            }) 
             .onMouseUp((e: PointerEvent) => {
-                app.canvas.endBrushStroke(e)
+                if (e.button === 0) app.canvas.endBrushStroke(e)
             })
         this.toolManager.addTool(ToolType.Eraser)
             .onActivate(() => {

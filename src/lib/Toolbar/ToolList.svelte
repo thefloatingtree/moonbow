@@ -49,12 +49,12 @@
             <div class="text-white select-none">Brush</div>
         </div>
     </ToolbarCard>
-    <!-- <ToolbarCard cardType={CardType.Eraser}>
+    <ToolbarCard cardType={CardType.Eraser}>
         <Tool on:click={() => handleToolClick(ToolType.Eraser, CardType.Eraser)} active={selectedTool === ToolType.Eraser}><FaEraser /></Tool>
         <div slot="content">
             <div class="text-white select-none">Eraser</div>
         </div>
-    </ToolbarCard> -->
+    </ToolbarCard>
     <Tool on:click={() => handleToolClick(ToolType.Pan)} active={selectedTool === ToolType.Pan}><FaHandPaper /></Tool>
     <Tool on:click={() => handleToolClick(ToolType.Zoom)} active={selectedTool === ToolType.Zoom}><FaSearch /></Tool>
     <Tool on:click={() => handleToolClick(ToolType.Rotate)} active={selectedTool === ToolType.Rotate}><FaCompass /></Tool>

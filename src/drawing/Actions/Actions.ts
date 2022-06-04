@@ -1,5 +1,4 @@
 export class Action {
-
     constructor(protected shortcut: Array<string>, protected action: Function) {}
 
     protected allPressed(keyboard: Object) {

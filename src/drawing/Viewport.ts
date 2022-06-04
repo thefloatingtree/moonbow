@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { app } from './App'
-import type { Canvas } from './Canvas'
+import type { Canvas } from './Canvas/Canvas'
 import { distance } from './util'
 
 export class Viewport {
