@@ -5,6 +5,7 @@ import { Canvas } from './Canvas/Canvas'
 import { ToolManager } from './Tools/ToolManager'
 import { Viewport } from './Viewport'
 import { ToolType } from './Tools/ToolTypes'
+import { RenderTexturePool } from './Canvas/RenderTexturePool'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -13,6 +14,7 @@ export class App {
     public viewport: Viewport
     public actionManager: ActionManager
     public toolManager: ToolManager
+    public renderTexturePool: RenderTexturePool
 
     private afterInitCallbacks: Array<Function> = []
 
@@ -28,6 +30,7 @@ export class App {
 
         this.application = new PIXI.Application({ view: this.ref, backgroundColor: 0x3E3E46, resizeTo: window, antialias: true })
 
+        this.renderTexturePool = new RenderTexturePool()
         this.canvas = new Canvas()
         this.viewport = new Viewport(this.canvas)
         this.actionManager = new ActionManager()
@@ -67,9 +70,9 @@ export class App {
         this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool(ToolType.Brush)))
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
         // undo/redo
-        this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.canvas.undo()))
-        this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.canvas.redo()))
-        this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.canvas.redo()))
+        // this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.canvas.undo()))
+        // this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.canvas.redo()))
+        // this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.canvas.redo()))
     }
 
     private addTools() {
@@ -113,9 +116,6 @@ export class App {
 
         // painting
         this.toolManager.addTool(ToolType.Brush)
-            .onActivate(() => {
-                console.log("Brush")
-            })
             .onMouseDown((e: PointerEvent) => {
                 if (e.button === 0) app.canvas.startBrushStroke(e)
             })
@@ -126,8 +126,14 @@ export class App {
                 if (e.button === 0) app.canvas.endBrushStroke(e)
             })
         this.toolManager.addTool(ToolType.Eraser)
-            .onActivate(() => {
-                console.log("Eraser")
+            .onMouseDown((e: PointerEvent) => {
+                if (e.button === 0) app.canvas.startBrushStroke(e, true)
+            })
+            .onMouseMove((e: PointerEvent) => {
+                app.canvas.updateBrushStroke(e, true)
+            }) 
+            .onMouseUp((e: PointerEvent) => {
+                if (e.button === 0) app.canvas.endBrushStroke(e, true)
             })
 
         this.toolManager.selectTool(ToolType.Brush)

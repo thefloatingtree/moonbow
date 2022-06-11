@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import { app } from './App';
 
 // https://easings.net/
 export const Easing = {
@@ -120,3 +121,12 @@ export class Matrix extends PIXI.Matrix {
         return a * b + c * d
     }
 }
+
+export function renderAsSprite(object: PIXI.DisplayObject, renderTexture: PIXI.RenderTexture): PIXI.Sprite {
+    app.application.renderer.render(object, { renderTexture })
+    return new PIXI.Sprite(renderTexture)
+}
+
+export const glsl = x => x[0];
+export const frag = x => x[0];
+export const vert = x => x[0];

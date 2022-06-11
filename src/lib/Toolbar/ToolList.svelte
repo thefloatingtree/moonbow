@@ -12,6 +12,8 @@
     import ToolbarCard from "./Card/ToolbarCard.svelte";
     import { toggleCard } from "./Card/CardState";
     import { CardType } from "./Card/CardTypes";
+    import ColorPicker from "./ColorPicker/ColorPicker.svelte";
+import { color } from "../stores/brushSettings";
 
     let selectedTool: ToolType = null;
 
@@ -36,12 +38,13 @@
 </script>
 
 <div>
-    <!-- <ToolbarCard cardType={CardType.Color} snapTop>
-        <Tool on:click={() => toggleCard(CardType.Color)}><div class="rounded-full bg-blue-600 w-7 h-7" /></Tool>
+    <ToolbarCard cardType={CardType.Color} snapTop>
+        <Tool on:click={() => toggleCard(CardType.Color)}><div class="rounded-full w-7 h-7" style:background-color={$color}/></Tool>
         <div slot="content">
             <div class="text-white select-none">Colors</div>
+            <ColorPicker />
         </div>
-    </ToolbarCard> -->
+    </ToolbarCard>
     <!-- <Tool on:click={() => handleToolClick(ToolType.Select)} active={selectedTool === ToolType.Select}><FaLocationArrow /></Tool> -->
     <ToolbarCard cardType={CardType.Brush}>
         <Tool on:click={() => handleToolClick(ToolType.Brush, CardType.Brush)} active={selectedTool === ToolType.Brush}><FaPaintBrush /></Tool>

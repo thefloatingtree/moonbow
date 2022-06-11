@@ -7,5 +7,5 @@ export default {
     sveltePreprocess({
       postcss: true,
     }),
-  ],
+  ]
 };

@@ -1,14 +1,16 @@
 import * as PIXI from 'pixi.js'
+import type { BrushSettings } from 'src/models/BrushSettings'
 import { SmoothStroke } from './SmothStroke'
 
 export class BrushStroke {
 
     container: PIXI.Container = new PIXI.Container()
     smoothStroke: SmoothStroke = new SmoothStroke()
+    alphaFilter = new PIXI.filters.AlphaFilter()
 
     lastPressure: number = 0
 
-    addNode(x: number, y: number, pressure: number, texture?: PIXI.RenderTexture) {
+    addNode(x: number, y: number, pressure: number, brushSettings: BrushSettings) {
         const points = this.smoothStroke.addPoint(x, y)
         for (let i = 0; i < points.length; i++) {
             const { x, y } = points[i]
@@ -27,13 +29,13 @@ export class BrushStroke {
             const sprite = PIXI.Sprite.from('./src/assets/hard_round.png')
             sprite.position.set(x, y)
             sprite.anchor.set(0.5)
-            sprite.tint = 0x000000
+            sprite.tint = PIXI.utils.string2hex(brushSettings.color)
             // sprite.alpha = brushAlpha
-            sprite.scale.set(0.1)
+            sprite.scale.set(brushSettings.size)
             this.container.addChild(sprite)
 
-            // this.alphaFilter.alpha = this.brush.opacity
-            // this.container.filters = [this.alphaFilter]
+            this.alphaFilter.alpha = brushSettings.opacity
+            this.container.filters = [this.alphaFilter]
         }
 
         // this.lastPressure = pressure
