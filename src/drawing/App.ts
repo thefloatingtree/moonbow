@@ -6,6 +6,8 @@ import { ToolManager } from './Tools/ToolManager'
 import { Viewport } from './Viewport'
 import { ToolType } from './Tools/ToolTypes'
 import { RenderTexturePool } from './Canvas/RenderTexturePool'
+import { color, opacity, size } from '../lib/stores/brushSettings'
+import { colorPickerStore } from '../lib/stores/colorPicker'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -38,6 +40,7 @@ export class App {
 
         this.addActions()
         this.addTools()
+        this.addUIIntegrations()
 
         this.application.stage.addChild(this.viewport.container)
 
@@ -69,6 +72,8 @@ export class App {
         // tools
         this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool(ToolType.Brush)))
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
+        this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.Eyedropper)))
+        this.actionManager.addAction(new OnUpTriggerAction(['alt'], () => this.toolManager.selectPreviousTool()))
         // undo/redo
         // this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.canvas.undo()))
         // this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.canvas.redo()))
@@ -121,7 +126,7 @@ export class App {
             })
             .onMouseMove((e: PointerEvent) => {
                 app.canvas.updateBrushStroke(e)
-            }) 
+            })
             .onMouseUp((e: PointerEvent) => {
                 if (e.button === 0) app.canvas.endBrushStroke(e)
             })
@@ -131,12 +136,32 @@ export class App {
             })
             .onMouseMove((e: PointerEvent) => {
                 app.canvas.updateBrushStroke(e, true)
-            }) 
+            })
             .onMouseUp((e: PointerEvent) => {
                 if (e.button === 0) app.canvas.endBrushStroke(e, true)
             })
 
+        // other tools
+        this.toolManager.addTool(ToolType.Eyedropper)
+            .onMouseUp(e => {
+                const hex = app.viewport.colorAt(e)
+                color.set(hex)
+            })
+
         this.toolManager.selectTool(ToolType.Brush)
+    }
+
+    private addUIIntegrations() {
+        color.set(app.canvas.brushSettings.color);
+        opacity.set(app.canvas.brushSettings.opacity);
+        size.set(app.canvas.brushSettings.size);
+
+        color.subscribe((color) => (app.canvas.brushSettings.color = color));
+        opacity.subscribe((opacity) => (app.canvas.brushSettings.opacity = opacity));
+        size.subscribe((size) => (app.canvas.brushSettings.size = size));
+
+        colorPickerStore.set({ hex: app.canvas.brushSettings.color })
+        // colorPickerStore.subscribe(e => console.log(e))
     }
 }
 

@@ -1,3 +1,30 @@
+diff --git a/node_modules/svelte-awesome-color-picker/ColorPicker.svelte b/node_modules/svelte-awesome-color-picker/ColorPicker.svelte
+index 4695246..395dd9b 100644
+--- a/node_modules/svelte-awesome-color-picker/ColorPicker.svelte
++++ b/node_modules/svelte-awesome-color-picker/ColorPicker.svelte
+@@ -48,14 +48,14 @@ function getComponents() {
+ let button;
+ let wrapper;
+ function mousedown({ target }) {
+-    if (isInput) {
+-        if (button.isSameNode(target)) {
+-            isOpen = !isOpen;
+-        }
+-        else if (isOpen && !wrapper.contains(target)) {
+-            isOpen = false;
+-        }
+-    }
++    // if (isInput) {
++    //     if (button.isSameNode(target)) {
++    //         isOpen = !isOpen;
++    //     }
++    //     else if (isOpen && !wrapper.contains(target)) {
++    //         isOpen = false;
++    //     }
++    // }
+ }
+ $: {
+     if (color && isHsv(color)) {
 diff --git a/node_modules/svelte-awesome-color-picker/util/convert.js b/node_modules/svelte-awesome-color-picker/util/convert.js
 index e0a4f73..d4fdb9e 100644
 --- a/node_modules/svelte-awesome-color-picker/util/convert.js

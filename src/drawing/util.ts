@@ -62,10 +62,10 @@ export function magnitude(x: number, y: number): number {
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
 }
 
-export function distance(x1: number, y1: number, x2: number, y2: number){
+export function distance(x1: number, y1: number, x2: number, y2: number) {
     let y = x2 - x1;
     let x = y2 - y1;
-    
+
     return Math.sqrt(x * x + y * y);
 }
 
@@ -113,7 +113,7 @@ export class Matrix extends PIXI.Matrix {
         matrix.d = scaleY
         matrix.tx = tx
         matrix.ty = ty
-        
+
         return matrix
     }
 
@@ -130,3 +130,7 @@ export function renderAsSprite(object: PIXI.DisplayObject, renderTexture: PIXI.R
 export const glsl = x => x[0];
 export const frag = x => x[0];
 export const vert = x => x[0];
+
+export function rgb2hex({ r, g, b }) {
+    return [r, g, b].reduce((acc, v) => `${acc}${v.toString(16).padStart(2, '0')}`, '#')
+}

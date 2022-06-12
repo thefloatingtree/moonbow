@@ -6,4 +6,5 @@ export enum ToolType {
     Zoom,
     WheelZoom,
     Rotate,
+    Eyedropper
 }

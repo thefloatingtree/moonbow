@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { app } from './App'
 import type { Canvas } from './Canvas/Canvas'
-import { distance } from './util'
+import { distance, rgb2hex } from './util'
 
 export class Viewport {
 
@@ -46,9 +46,9 @@ export class Viewport {
 
         const radius = distance(pivot.x, pivot.y, canvasCenter.x, canvasCenter.y)
 
-        const newPosition = { 
-            x: radius * Math.cos(this.circularRotation) + pivot.x, 
-            y: radius * Math.sin(this.circularRotation) + pivot.y 
+        const newPosition = {
+            x: radius * Math.cos(this.circularRotation) + pivot.x,
+            y: radius * Math.sin(this.circularRotation) + pivot.y
         }
 
         this.container.position.x = newPosition.x
@@ -93,7 +93,7 @@ export class Viewport {
         this.container.y -= newScreenPos.y - y
         this.container.scale.x = scale
         this.container.scale.y = scale
- 
+
 
         this.updateRotation()
         this.updateMask()
@@ -123,6 +123,18 @@ export class Viewport {
 
         this.updateRotation()
         this.updateMask()
+    }
+
+    colorAt(e: PointerEvent) {
+        const renderTexture = app.renderTexturePool.acquire(app.application.screen.width, app.application.screen.height)
+        app.application.renderer.render(app.application.stage, { renderTexture })
+        app.renderTexturePool.release(renderTexture)
+        
+        const canvas = app.application.renderer.plugins.extract.canvas(renderTexture)
+        const canvasContext = canvas.getContext("2d")
+        const [ r, g, b, _ ] = canvasContext.getImageData(e.x, e.y, 1, 1).data
+        
+        return rgb2hex({ r, g, b })
     }
 
     private updateRotation() {

@@ -19,6 +19,7 @@
 </script>
 
 <ColorPicker
+    toRight
     isOpen
     isPopup={false}
     bind:color={$colorPickerStore}
@@ -32,5 +33,4 @@
         pickerWrapper: PickerWrapper,
         wrapper: Wrapper,
     }}
-    toRight
 />

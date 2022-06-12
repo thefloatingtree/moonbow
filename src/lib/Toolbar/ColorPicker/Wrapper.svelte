@@ -1,27 +1,10 @@
 <script lang="ts">
 	export let wrapper: HTMLElement;
-	export let isOpen: boolean;
-	export let isPopup: boolean;
+	export let isOpen;
+	export let isPopup;
+	export let toRight;
 </script>
 
-<div class="flex flex-col py-3 w-full" bind:this={wrapper} class:isOpen class:isPopup>
+<div class="flex flex-col py-3 w-full" bind:this={wrapper}>
 	<slot />
 </div>
-
-<!-- <style>
-	div {
-		padding: 8px 5px 5px 8px;
-		background-color: white;
-		margin: 0 10px 10px;
-		border: 1px solid black;
-		border-radius: 12px;
-		display: none;
-	}
-	.isOpen {
-		display: block;
-	}
-	.isPopup {
-		position: absolute;
-		z-index: 2;
-	}
-</style> -->
