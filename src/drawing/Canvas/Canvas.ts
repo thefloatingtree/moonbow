@@ -68,48 +68,31 @@ export class Canvas {
         this.pointerDown = true
 
         this.liveBrushStroke = new BrushStroke()
-        if (!erase) this.container.addChild(this.liveBrushStroke.container)
+        this.container.addChild(this.liveBrushStroke.container)
     }
 
     updateBrushStroke(e: PointerEvent, erase: boolean = false) {
         if (this.pointerDown) {
             const { x, y } = e
             const adjusted = app.viewport.convertScreenToCanvas(x, y)
-            this.liveBrushStroke.addNode(adjusted.x, adjusted.y, e.pressure, this.brushSettings)
+            this.liveBrushStroke.addNode(adjusted.x, adjusted.y, e.pressure, this.brushSettings, erase)
 
-            if (erase) {
-                this.activeLayer.addEraserStroke(this.liveBrushStroke.container)
-            }
+            // if (erase) {
+            //     this.activeLayer.addEraserStroke(this.liveBrushStroke.container)
+            // }
         }
     }
 
     endBrushStroke(_: PointerEvent, erase: boolean = false) {
         this.pointerDown = false
-
-        if (erase) return this.activeLayer.test()
         
         this.activeLayer.addBrushStroke(this.liveBrushStroke.container)
         this.container.removeChild(this.liveBrushStroke.container)
-
-        this.activeLayer.test()
 
         // this.updateEraseMask()
         // this.container.addChild(this.eraseMask)
         // this.undoStack.push(canvasSprite)
         // this.redoStack = []
-    }
-
-    private updateEraseMask() {
-
-
-
-        // this.container.addChild(this.eraseMask)
-        // this.container.mask = this.eraseMask
-    }
-
-    private applyMask(mask: PIXI.Sprite) {
-        this.container.addChild(mask)
-        this.container.mask = mask
     }
 }
 

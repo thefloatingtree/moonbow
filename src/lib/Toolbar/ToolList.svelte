@@ -16,6 +16,7 @@
     import ColorPicker from "./ColorPicker/ColorPicker.svelte";
     import { color } from "../stores/brushSettings";
     import convert from "svelte-awesome-color-picker/util/convert";
+import SizeSlider from "./Card/Brush/SizeSlider.svelte";
 
     let selectedTool: ToolType = null;
     let colorBorderWidth: string = "0px";
@@ -25,7 +26,7 @@
             if (cardType !== null) toggleCard(cardType);
         }
 
-        console.log()
+        console.log();
 
         selectedTool = toolType;
         app.toolManager.selectTool(selectedTool);
@@ -43,8 +44,8 @@
 
     $: {
         if ($color) {
-            const value = convert.hex2Color({ hex: $color })['v']
-            colorBorderWidth = value <= 0.5 ? "0.15rem" : "0rem"
+            const value = convert.hex2Color({ hex: $color })["v"];
+            colorBorderWidth = value <= 0.5 ? "0.15rem" : "0rem";
         }
     }
 </script>
@@ -66,6 +67,7 @@
         </Tool>
         <div slot="content">
             <div class="text-white select-none">Brush</div>
+            <SizeSlider></SizeSlider>
         </div>
     </ToolbarCard>
     <ToolbarCard cardType={CardType.Eraser}>

@@ -66,6 +66,7 @@ export class Viewport {
     }
 
     scrubbyRotateUpdate(e: MouseEvent) {
+        if (!this.scrubbyRotateInitialPoint) return
         const pivot = { x: app.application.screen.width / 2, y: app.application.screen.height / 2 }
         const rotationDelta = Math.atan2(e.y - pivot.y, e.x - pivot.x) - Math.atan2(this.scrubbyRotateInitialPoint.y - pivot.y, this.scrubbyRotateInitialPoint.x - pivot.x)
         this.rotateTo(this.scrubbyRotateInitialCircularRotation + rotationDelta, this.scrubbyRotateInitialRotation + rotationDelta)
@@ -109,6 +110,7 @@ export class Viewport {
     }
 
     scrubbyZoomUpdate(e: PointerEvent) {
+        if (!this.scrubbyZoomInitialPoint) return
         const scale = this.container.scale.x + (e.movementX / 200) * this.container.scale.x
         this.zoomToPoint(this.scrubbyZoomInitialPoint.x, this.scrubbyZoomInitialPoint.y, scale)
     }
