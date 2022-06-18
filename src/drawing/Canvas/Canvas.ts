@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js'
 import type { BrushSettings } from 'src/models/BrushSettings'
+import { handle_promise } from 'svelte/internal'
 import { app } from '../App'
-import { BrushStroke } from './BrushStroke'
+import type { Brush } from '../Brush/Brush'
+import { BrushStroke } from '../Brush/BrushStroke'
 import { Layer } from './Layer'
 
 
@@ -14,15 +16,29 @@ export class Canvas {
     }
 
     public brushSettings: BrushSettings = {
-        color: "#FFF000",
+        color: "#03B3FF",
         opacity: 1,
-        size: 0.1,
+        size: 10,
+        spacing: 2,
+        tipType: 'circle',
+        hardness: 2
     }
 
+    public eraserSettings: BrushSettings = {
+        color: "#FFFFFF",
+        opacity: 1,
+        size: 10,
+        spacing: 2,
+        tipType: 'circle',
+        hardness: 2
+    }
+
+    
     private liveBrushStroke: BrushStroke
     private pointerDown: boolean
-
+    
     private activeLayer: Layer
+    public activeBrush: Brush
 
     // private undoStack: Array<PIXI.Sprite> = []
     // private redoStack: Array<PIXI.Sprite> = []
@@ -67,7 +83,10 @@ export class Canvas {
     startBrushStroke(_: PointerEvent, erase: boolean = false) {
         this.pointerDown = true
 
-        this.liveBrushStroke = new BrushStroke()
+        const settings = erase ? this.eraserSettings : this.brushSettings
+        const brush = app.brushManager.getBrush(settings)
+
+        this.liveBrushStroke = new BrushStroke(brush)
         this.container.addChild(this.liveBrushStroke.container)
     }
 
@@ -75,11 +94,7 @@ export class Canvas {
         if (this.pointerDown) {
             const { x, y } = e
             const adjusted = app.viewport.convertScreenToCanvas(x, y)
-            this.liveBrushStroke.addNode(adjusted.x, adjusted.y, e.pressure, this.brushSettings, erase)
-
-            // if (erase) {
-            //     this.activeLayer.addEraserStroke(this.liveBrushStroke.container)
-            // }
+            this.liveBrushStroke.addNode(adjusted.x, adjusted.y, e.pressure)
         }
     }
 
@@ -88,11 +103,6 @@ export class Canvas {
         
         this.activeLayer.addBrushStroke(this.liveBrushStroke.container)
         this.container.removeChild(this.liveBrushStroke.container)
-
-        // this.updateEraseMask()
-        // this.container.addChild(this.eraseMask)
-        // this.undoStack.push(canvasSprite)
-        // this.redoStack = []
     }
 }
 

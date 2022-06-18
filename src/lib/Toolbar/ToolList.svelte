@@ -14,9 +14,11 @@
     import { toggleCard } from "./Card/CardState";
     import { CardType } from "./Card/CardTypes";
     import ColorPicker from "./ColorPicker/ColorPicker.svelte";
-    import { color } from "../stores/brushSettings";
+    import { brushColor, brushHardness, brushSize, brushSpacing } from "../stores/brushSettings";
     import convert from "svelte-awesome-color-picker/util/convert";
-import SizeSlider from "./Card/Brush/SizeSlider.svelte";
+    import SizeSlider from "./Card/Slider.svelte";
+    import TipList from "./Card/Brush/TipList.svelte";
+    import { eraserHardness, eraserSize, eraserSpacing } from "../stores/eraserSettings";
 
     let selectedTool: ToolType = null;
     let colorBorderWidth: string = "0px";
@@ -25,8 +27,6 @@ import SizeSlider from "./Card/Brush/SizeSlider.svelte";
         if (selectedTool === toolType) {
             if (cardType !== null) toggleCard(cardType);
         }
-
-        console.log();
 
         selectedTool = toolType;
         app.toolManager.selectTool(selectedTool);
@@ -43,8 +43,8 @@ import SizeSlider from "./Card/Brush/SizeSlider.svelte";
     });
 
     $: {
-        if ($color) {
-            const value = convert.hex2Color({ hex: $color })["v"];
+        if ($brushColor) {
+            const value = convert.hex2Color({ hex: $brushColor })["v"];
             colorBorderWidth = value <= 0.5 ? "0.15rem" : "0rem";
         }
     }
@@ -53,7 +53,7 @@ import SizeSlider from "./Card/Brush/SizeSlider.svelte";
 <div>
     <ToolbarCard cardType={CardType.Color} snapTop>
         <Tool on:click={() => toggleCard(CardType.Color)}>
-            <div style:background-color={$color} style:outline-width={colorBorderWidth} class="rounded-full w-7 h-7 outline outline-white outline-4" />
+            <div style:background-color={$brushColor} style:outline-width={colorBorderWidth} class="rounded-full w-7 h-7 outline outline-white outline-4" />
         </Tool>
         <div slot="content">
             <div class="text-white select-none">Colors</div>
@@ -65,9 +65,21 @@ import SizeSlider from "./Card/Brush/SizeSlider.svelte";
         <Tool on:click={() => handleToolClick(ToolType.Brush, CardType.Brush)} active={selectedTool === ToolType.Brush}>
             <FaPaintBrush />
         </Tool>
-        <div slot="content">
+        <div class="space-y-3" slot="content">
             <div class="text-white select-none">Brush</div>
-            <SizeSlider></SizeSlider>
+            <TipList />
+            <div class="space-y-1">
+                <div class="text-gray-400">Size</div>
+                <SizeSlider bind:value={$brushSize} min={1} max={100} />
+            </div>
+            <div class="space-y-1">
+                <div class="text-gray-400">Hardness</div>
+                <SizeSlider bind:value={$brushHardness} min={1} max={20} />
+            </div>
+            <!-- <div class="space-y-1">
+                <div class="text-gray-400">Spacing</div>
+                <SizeSlider bind:value={$brushSpacing} />
+            </div> -->
         </div>
     </ToolbarCard>
     <ToolbarCard cardType={CardType.Eraser}>
@@ -76,6 +88,19 @@ import SizeSlider from "./Card/Brush/SizeSlider.svelte";
         </Tool>
         <div slot="content">
             <div class="text-white select-none">Eraser</div>
+            <TipList />
+            <div class="space-y-1">
+                <div class="text-gray-400">Size</div>
+                <SizeSlider bind:value={$eraserSize} min={1} max={100} />
+            </div>
+            <div class="space-y-1">
+                <div class="text-gray-400">Hardness</div>
+                <SizeSlider bind:value={$eraserHardness} min={1} max={20} />
+            </div>
+            <!-- <div class="space-y-1">
+                <div class="text-gray-400">Spacing</div>
+                <SizeSlider bind:value={$eraserSpacing} />
+            </div> -->
         </div>
     </ToolbarCard>
     <Tool on:click={() => handleToolClick(ToolType.Pan)} active={selectedTool === ToolType.Pan}>

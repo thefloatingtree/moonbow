@@ -7,13 +7,13 @@
     import PickerIndicator from "./PickerIndicator.svelte";
     import PickerWrapper from "./PickerWrapper.svelte";
     import Wrapper from "./Wrapper.svelte";
-    import { color, opacity } from "../../stores/brushSettings";
+    import { brushColor, brushOpacity } from "../../stores/brushSettings";
     import { colorPickerStore } from '../../stores/colorPicker';
 
     $: {
         if ($colorPickerStore.a && $colorPickerStore.hex) {
-            $color = $colorPickerStore.hex.slice(0, -2)
-            $opacity = $colorPickerStore.a
+            $brushColor = $colorPickerStore.hex.slice(0, -2)
+            $brushOpacity = $colorPickerStore.a
         }
     }
 </script>

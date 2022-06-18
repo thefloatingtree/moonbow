@@ -5,9 +5,12 @@ import { Canvas } from './Canvas/Canvas'
 import { ToolManager } from './Tools/ToolManager'
 import { Viewport } from './Viewport'
 import { ToolType } from './Tools/ToolTypes'
-import { RenderTexturePool } from './Canvas/RenderTexturePool'
-import { color, opacity, size } from '../lib/stores/brushSettings'
+import { RenderTexturePool } from './Util/RenderTexturePool'
+import { brushColor, brushHardness, brushOpacity, brushSize, brushSpacing, brushTipType } from '../lib/stores/brushSettings'
 import { colorPickerStore } from '../lib/stores/colorPicker'
+import { BrushManager } from './Brush/BrushManager'
+import { space } from 'svelte/internal'
+import { eraserHardness, eraserOpacity, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -17,6 +20,7 @@ export class App {
     public actionManager: ActionManager
     public toolManager: ToolManager
     public renderTexturePool: RenderTexturePool
+    public brushManager: BrushManager
 
     private afterInitCallbacks: Array<Function> = []
 
@@ -26,7 +30,7 @@ export class App {
         PIXI.settings.FILTER_RESOLUTION = 1
         PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH
         PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.ON
-        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
         PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
         PIXI.utils.skipHello()
 
@@ -37,6 +41,7 @@ export class App {
         this.viewport = new Viewport(this.canvas)
         this.actionManager = new ActionManager()
         this.toolManager = new ToolManager()
+        this.brushManager = new BrushManager()
 
         this.addActions()
         this.addTools()
@@ -145,23 +150,40 @@ export class App {
         this.toolManager.addTool(ToolType.Eyedropper)
             .onMouseUp(e => {
                 const hex = app.viewport.colorAt(e)
-                color.set(hex)
+                brushColor.set(hex)
             })
 
         this.toolManager.selectTool(ToolType.Brush)
     }
 
     private addUIIntegrations() {
-        color.set(app.canvas.brushSettings.color);
-        opacity.set(app.canvas.brushSettings.opacity);
-        size.set(app.canvas.brushSettings.size);
-
-        color.subscribe((color) => (app.canvas.brushSettings.color = color));
-        opacity.subscribe((opacity) => (app.canvas.brushSettings.opacity = opacity));
-        size.subscribe((size) => (app.canvas.brushSettings.size = size));
-
         colorPickerStore.set({ hex: app.canvas.brushSettings.color })
-        // colorPickerStore.subscribe(e => console.log(e))
+
+        brushColor.set(app.canvas.brushSettings.color)
+        brushOpacity.set(app.canvas.brushSettings.opacity)
+        brushSize.set(app.canvas.brushSettings.size)
+        brushHardness.set(app.canvas.brushSettings.hardness)
+        brushSpacing.set(app.canvas.brushSettings.spacing)
+        brushTipType.set(app.canvas.brushSettings.tipType)
+
+        brushColor.subscribe((color) => (app.canvas.brushSettings.color = color))
+        brushOpacity.subscribe((opacity) => (app.canvas.brushSettings.opacity = opacity))
+        brushSize.subscribe((size) => (app.canvas.brushSettings.size = size))
+        brushHardness.subscribe((hardness) => (app.canvas.brushSettings.hardness = hardness))
+        brushSpacing.subscribe((spacing) => (app.canvas.brushSettings.spacing = spacing))
+        brushTipType.subscribe((tipType) => (app.canvas.brushSettings.tipType = tipType))
+
+        eraserOpacity.set(app.canvas.eraserSettings.opacity)
+        eraserSize.set(app.canvas.eraserSettings.size)
+        eraserHardness.set(app.canvas.eraserSettings.hardness)
+        eraserSpacing.set(app.canvas.eraserSettings.spacing)
+        eraserTipType.set(app.canvas.eraserSettings.tipType)
+
+        eraserOpacity.subscribe((opacity) => (app.canvas.eraserSettings.opacity = opacity))
+        eraserSize.subscribe((size) => (app.canvas.eraserSettings.size = size))
+        eraserHardness.subscribe((hardness) => (app.canvas.eraserSettings.hardness = hardness))
+        eraserSpacing.subscribe((spacing) => (app.canvas.eraserSettings.spacing = spacing))
+        eraserTipType.subscribe((tipType) => (app.canvas.eraserSettings.tipType = tipType))
     }
 }
 
