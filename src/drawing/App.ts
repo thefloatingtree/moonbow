@@ -9,8 +9,9 @@ import { RenderTexturePool } from './Util/RenderTexturePool'
 import { brushColor, brushHardness, brushOpacity, brushSize, brushSpacing, brushTipType } from '../lib/stores/brushSettings'
 import { colorPickerStore } from '../lib/stores/colorPicker'
 import { BrushManager } from './Brush/BrushManager'
-import { space } from 'svelte/internal'
 import { eraserHardness, eraserOpacity, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
+import { Connection } from './Connection'
+import { ArtistManager } from './Artist/ArtistManager'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -21,18 +22,15 @@ export class App {
     public toolManager: ToolManager
     public renderTexturePool: RenderTexturePool
     public brushManager: BrushManager
+    public connection: Connection
+    public artistManager: ArtistManager
 
     private afterInitCallbacks: Array<Function> = []
 
     init(ref: HTMLCanvasElement) {
         this.ref = ref
 
-        PIXI.settings.FILTER_RESOLUTION = 1
-        PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH
-        PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.ON
-        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
-        PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
-        PIXI.utils.skipHello()
+        this.configurePIXI()
 
         this.application = new PIXI.Application({ view: this.ref, backgroundColor: 0x3E3E46, resizeTo: window, antialias: true })
 
@@ -42,13 +40,16 @@ export class App {
         this.actionManager = new ActionManager()
         this.toolManager = new ToolManager()
         this.brushManager = new BrushManager()
+        this.connection = new Connection()
+        this.artistManager = new ArtistManager()
 
         this.addActions()
         this.addTools()
         this.addUIIntegrations()
 
-        this.application.stage.addChild(this.viewport.container)
+        this.connection.connect()
 
+        this.application.stage.addChild(this.viewport.container)
         this.application.start()
 
         this.afterInitCallbacks.forEach(fn => fn())
@@ -56,6 +57,15 @@ export class App {
 
     onAfterInit(fn: Function) {
         this.afterInitCallbacks.push(fn)
+    }
+
+    private configurePIXI() {
+        PIXI.settings.FILTER_RESOLUTION = 1
+        PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH
+        PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.ON
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+        PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
+        PIXI.utils.skipHello()
     }
 
     private addActions() {
