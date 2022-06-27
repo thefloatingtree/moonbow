@@ -6,6 +6,18 @@
     import { toggleCard } from "./Card/CardState";
     import { CardType } from "./Card/CardTypes";
     import { artists } from "../stores/artists";
+    import { app } from "../../drawing/App";
+
+    let inviteButtonText = "Copy Invite URL"
+
+    function onCopyInvite() {
+        navigator.clipboard.writeText(app.connection.joinURL)
+        inviteButtonText = "Copied!"
+        setTimeout(() => {
+            inviteButtonText = "Copy Invite URL"
+        }, 2000)
+    }
+    
 </script>
 
 <div class="flex flex-col items-center space-y">
@@ -25,6 +37,7 @@
                     <div class="text-white">{artist.id}</div>
                 </div>
             {/each}
+            <div on:click={onCopyInvite} class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">{inviteButtonText}</div>
         </div>
     </ToolbarCard>
     <ToolbarCard cardType={CardType.Home} snapBottom>

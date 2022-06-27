@@ -24,6 +24,7 @@
     "vite": "^2.9.7"
   },
   "dependencies": {
+    "distinct-colors": "^3.0.0",
     "perfect-freehand": "^1.0.16",
     "pixi.js": "^6.3.0",
     "svelte-awesome-color-picker": "^0.0.10",

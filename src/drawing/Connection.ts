@@ -1,16 +1,17 @@
 import { app } from "./App"
-
-export const MessageTypes = Object.freeze({
-    SelfConnected: "SELF_CONNECTED",
-    ClientConnected: "CLIENT_CONNECTED",
-    ClientDisconected: "CLIENT_DISCONNECTED",
-    ClientMessage: "CLIENT_MESSAGE",
-    CurrentState: "CURRENT_STATE"
-})
+import { MessageTypes } from '../../server/MessageTypes'
 
 export class Connection {
 
     public ws: WebSocket = null
+
+    public userInfo
+    public joinURL = ""
+
+    private getRoomCode() {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get('room')
+    }
 
     connect() {
         this.ws = new WebSocket("ws://localhost:9001/")
@@ -18,21 +19,26 @@ export class Connection {
             this.ws.onmessage = event => {
                 const message = JSON.parse(event.data)
                 switch (message.type) {
-                    case MessageTypes.ClientConnected:
+                    case MessageTypes.OnClientConnected:
                         app.artistManager.addArtist(message.body)
                         break
-                    case MessageTypes.ClientDisconected:
+                    case MessageTypes.OnClientDisconected:
                         app.artistManager.removeArtist(message.body)
                         break
-                    case MessageTypes.CurrentState:
+                    case MessageTypes.GetCurrentState:
                         app.artistManager.addArtists(message.body.clients)
                         break
+                    case MessageTypes.OnSelfConnected:
+                        // TODO: make URL work on production too, not just localhost
+                        this.joinURL = "http://localhost:3000/?room=" + message.body.roomId
+                        this.userInfo = message.body
                     default:
                         console.log(message)
                 }
             }
 
-            this.ws.send(JSON.stringify({ type: MessageTypes.CurrentState }))
+            // TODO: move this somewhere else, join/create room screen
+            this.ws.send(JSON.stringify({ type: MessageTypes.JoinRoom, body: { roomId: this.getRoomCode() } }))
         }
     }
 
