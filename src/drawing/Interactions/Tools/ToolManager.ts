@@ -1,10 +1,9 @@
-import { app } from "../App"
+import { app } from "../../App"
+import type { IEventSource } from "../Events/IEventSource"
 import { EventType, Tool } from "./Tool"
 import type { ToolType } from "./ToolTypes"
 
 export class ToolManager {
-
-    private keyboard: Object = {}
     private tools: Map<ToolType, Tool> = new Map()
 
     private activeTool: Tool
@@ -12,8 +11,25 @@ export class ToolManager {
 
     private selectToolCallbacks: Array<(type: ToolType) => any> = []
  
-    constructor() {
-        this.setupEvents()
+    constructor(private eventSource: IEventSource) {
+        this.eventSource.onMouseDown((e) => {
+            this.runActiveTool(EventType.onMouseDown, e)
+        })
+        this.eventSource.onMouseUp((e) => {
+            this.runActiveTool(EventType.onMouseUp, e)
+        })
+        this.eventSource.onMouseMove((e) => {
+            this.runActiveTool(EventType.onMouseMove, e)
+        })
+        this.eventSource.onKeyboardUp((e) => {
+            this.runActiveTool(EventType.onKeyboardUp, e)
+        })
+        this.eventSource.onKeyboardDown((e) => {
+            this.runActiveTool(EventType.onKeyboardDown, e)
+        })
+        this.eventSource.onWheel((e) => {
+            this.runActiveTool(EventType.onWheel, e)
+        })
     }
 
     addTool(name: ToolType, alwaysActive: boolean = false) {
@@ -53,29 +69,6 @@ export class ToolManager {
                     }
                 })
             }
-        })
-    }
-
-    setupEvents() {
-        app.ref.addEventListener('pointerdown', (e) => {
-            this.runActiveTool(EventType.onMouseDown, e)
-        })
-        app.ref.addEventListener('pointerup', (e) => {
-            this.runActiveTool(EventType.onMouseUp, e)
-        })
-        app.ref.addEventListener('pointermove', (e) => {
-            this.runActiveTool(EventType.onMouseMove, e)
-        })
-        window.addEventListener('keyup', (e) => {
-            this.keyboard[e.key] = false
-            this.runActiveTool(EventType.onKeyboardUp, e)
-        })
-        window.addEventListener('keydown', (e) => {
-            this.keyboard[e.key] = true
-            this.runActiveTool(EventType.onKeyboardDown, e)
-        })
-        window.addEventListener('wheel', (e) => {
-            this.runActiveTool(EventType.onWheel, e)
         })
     }
 }

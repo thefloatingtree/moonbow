@@ -1,8 +1,10 @@
 import type { BrushSettings } from "src/models/BrushSettings";
-import { ActionManager } from "../Actions/ActionManager";
-import { ToolManager } from "../Tools/ToolManager";
+import { ActionManager } from "../Interactions/Actions/ActionManager";
+import type { IEventSource } from "../Interactions/Events/IEventSource";
+import { LocalEventSource } from "../Interactions/Events/LocalEventSource";
+import { ToolManager } from "../Interactions/Tools/ToolManager";
 
-export class Artist {
+export abstract class Artist {
     public brushSettings: BrushSettings = {
         color: "#03B3FF",
         opacity: 1,
@@ -26,9 +28,12 @@ export class Artist {
 
     constructor(
         public id: string,
-        public color: string
+        public color: string,
+        protected eventSource: IEventSource
     ) {
-        this.actionManager = new ActionManager()
-        this.toolManager = new ToolManager()
+        this.actionManager = new ActionManager(this.eventSource)
+        this.toolManager = new ToolManager(this.eventSource)
     }
+
+    abstract destroy(): void
 }

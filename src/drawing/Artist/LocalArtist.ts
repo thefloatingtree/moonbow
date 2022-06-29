@@ -1,12 +1,14 @@
 import { brushColor } from "../../lib/stores/brushSettings";
-import { OnDownTriggerAction, OnUpTriggerAction, OnHoldReleaseTriggerAction } from "../Actions/Actions";
+import { OnDownTriggerAction, OnUpTriggerAction, OnHoldReleaseTriggerAction } from "../Interactions/Actions/Actions";
 import { app } from "../App";
-import { ToolType } from "../Tools/ToolTypes";
+import { ToolType } from "../Interactions/Tools/ToolTypes";
 import { Artist } from "./Artist";
+import { LocalEventSource } from "../Interactions/Events/LocalEventSource";
 
 export class LocalArtist extends Artist {
+
     constructor(id: string, color: string) {
-        super(id, color)
+        super(id, color, new LocalEventSource())
 
         this.addActions()
         this.addTools()
@@ -33,6 +35,10 @@ export class LocalArtist extends Artist {
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
         this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.Eyedropper)))
         this.actionManager.addAction(new OnUpTriggerAction(['alt'], () => this.toolManager.selectPreviousTool()))
+    }
+
+    destroy(): void {
+        this.eventSource.destroy()
     }
 
     private addTools() {

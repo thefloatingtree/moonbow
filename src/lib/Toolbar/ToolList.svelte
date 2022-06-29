@@ -9,7 +9,7 @@
     import Tool from "./ToolbarIcon.svelte";
     import { onMount } from "svelte";
     import { app } from "../../drawing/App";
-    import { ToolType } from "../../drawing/Tools/ToolTypes";
+    import { ToolType } from "../../drawing/Interactions/Tools/ToolTypes";
     import ToolbarCard from "./Card/ToolbarCard.svelte";
     import { toggleCard } from "./Card/CardState";
     import { CardType } from "./Card/CardTypes";

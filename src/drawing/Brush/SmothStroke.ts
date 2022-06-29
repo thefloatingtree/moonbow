@@ -4,7 +4,7 @@ import { Point } from "./Point"
 export class SmoothStroke {
     private points = []
 
-    constructor(public spacing: number = 2) { console.log(this.spacing) }
+    constructor(public spacing: number = 2) { }
 
     addPoint(x: number, y: number) {
         this.points.push(new Point(x, y))
