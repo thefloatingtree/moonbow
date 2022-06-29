@@ -29,14 +29,14 @@
         }
 
         selectedTool = toolType;
-        app.toolManager.selectTool(selectedTool);
+        app.localArtist.toolManager.selectTool(selectedTool);
     }
 
     onMount(() => {
         app.onAfterInit(() => {
-            selectedTool = app.toolManager.selectedTool();
+            selectedTool = app.localArtist.toolManager.selectedTool();
 
-            app.toolManager.onSelectTool((toolType) => {
+            app.localArtist.toolManager.onSelectTool((toolType) => {
                 selectedTool = toolType;
             });
         });

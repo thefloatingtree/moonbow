@@ -38,7 +38,6 @@ export class Canvas {
     private pointerDown: boolean
     
     private activeLayer: Layer
-    public activeBrush: Brush
 
     // private undoStack: Array<PIXI.Sprite> = []
     // private redoStack: Array<PIXI.Sprite> = []

@@ -1,6 +1,8 @@
 import { app } from "./App"
 import { MessageTypes } from '../../server/MessageTypes'
 
+type MessageType = typeof MessageTypes[keyof typeof MessageTypes];
+
 export class Connection {
 
     public ws: WebSocket = null
@@ -45,5 +47,9 @@ export class Connection {
     disconnect() {
         this.ws.close()
         this.ws = null
+    }
+
+    sendMessage(type: MessageType, message: Object) {
+        this.ws.send(JSON.stringify({ type, body: message }))
     }
 }

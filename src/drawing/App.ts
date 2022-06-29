@@ -12,18 +12,20 @@ import { BrushManager } from './Brush/BrushManager'
 import { eraserHardness, eraserOpacity, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
 import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
+import { EventType } from './Tools/Tool'
+import { LocalArtist } from './Artist/LocalArtist'
 
 export class App {
     public ref: HTMLCanvasElement
     public application: PIXI.Application
     public canvas: Canvas
     public viewport: Viewport
-    public actionManager: ActionManager
-    public toolManager: ToolManager
     public renderTexturePool: RenderTexturePool
     public brushManager: BrushManager
     public connection: Connection
     public artistManager: ArtistManager
+
+    public localArtist: LocalArtist
 
     private afterInitCallbacks: Array<Function> = []
 
@@ -37,14 +39,13 @@ export class App {
         this.renderTexturePool = new RenderTexturePool()
         this.canvas = new Canvas()
         this.viewport = new Viewport(this.canvas)
-        this.actionManager = new ActionManager()
-        this.toolManager = new ToolManager()
         this.brushManager = new BrushManager()
-        this.connection = new Connection()
-        this.artistManager = new ArtistManager()
 
-        this.addActions()
-        this.addTools()
+        this.artistManager = new ArtistManager()
+        this.connection = new Connection()
+
+        this.localArtist = new LocalArtist("test", "#FFFFFF")
+
         this.addUIIntegrations()
 
         this.connection.connect()
@@ -66,104 +67,6 @@ export class App {
         PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
         PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
         PIXI.utils.skipHello()
-    }
-
-    private addActions() {
-        // navigation
-        // pan
-        this.actionManager.addAction(new OnDownTriggerAction([' '], () => this.toolManager.selectTool(ToolType.Pan)))
-        this.actionManager.addAction(new OnUpTriggerAction([' '], () => this.toolManager.selectPreviousTool()))
-        this.actionManager.addAction(new OnDownTriggerAction(['mousemiddle'], () => this.toolManager.selectTool(ToolType.Pan)))
-        this.actionManager.addAction(new OnUpTriggerAction(['mousemiddle'], () => this.toolManager.selectPreviousTool()))
-
-        // zoom
-        this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
-        this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
-        // rotate
-        this.actionManager.addAction(new OnDownTriggerAction(['r'], () => this.toolManager.selectTool(ToolType.Rotate)))
-        this.actionManager.addAction(new OnHoldReleaseTriggerAction(['r'], () => this.toolManager.selectPreviousTool()))
-        this.actionManager.addAction(new OnDownTriggerAction(['arrowleft'], () => this.viewport.rotateLeft()))
-        this.actionManager.addAction(new OnDownTriggerAction(['arrowright'], () => this.viewport.rotateRight()))
-        // tools
-        this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool(ToolType.Brush)))
-        this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
-        this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.Eyedropper)))
-        this.actionManager.addAction(new OnUpTriggerAction(['alt'], () => this.toolManager.selectPreviousTool()))
-        // undo/redo
-        // this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.canvas.undo()))
-        // this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.canvas.redo()))
-        // this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.canvas.redo()))
-    }
-
-    private addTools() {
-
-        // navigation
-        this.toolManager.addTool(ToolType.Pan)
-            .onMouseMove((e) => {
-                if (e.buttons) {
-                    app.viewport.pan(e)
-                }
-            })
-        this.toolManager.addTool(ToolType.Zoom)
-            .onMouseDown((e) => {
-                app.viewport.scrubbyZoomStart(e)
-            })
-            .onMouseMove((e) => {
-                if (e.buttons) {
-                    app.viewport.scrubbyZoomUpdate(e)
-                }
-            })
-            .onMouseUp((e) => {
-                app.viewport.scrubbyZoomEnd(e)
-            })
-
-        this.toolManager.addTool(ToolType.WheelZoom, true)
-            .onWheel((e: WheelEvent) => {
-                app.viewport.wheelZoom(e)
-            })
-        this.toolManager.addTool(ToolType.Rotate)
-            .onMouseDown((e) => {
-                app.viewport.scrubbyRotateStart(e)
-            })
-            .onMouseMove((e) => {
-                if (e.buttons) {
-                    app.viewport.scrubbyRotateUpdate(e)
-                }
-            })
-            .onMouseUp((e) => {
-                app.viewport.scrubbyRotateEnd(e)
-            })
-
-        // painting
-        this.toolManager.addTool(ToolType.Brush)
-            .onMouseDown((e: PointerEvent) => {
-                if (e.button === 0) app.canvas.startBrushStroke(e)
-            })
-            .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStroke(e)
-            })
-            .onMouseUp((e: PointerEvent) => {
-                if (e.button === 0) app.canvas.endBrushStroke(e)
-            })
-        this.toolManager.addTool(ToolType.Eraser)
-            .onMouseDown((e: PointerEvent) => {
-                if (e.button === 0) app.canvas.startBrushStroke(e, true)
-            })
-            .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStroke(e, true)
-            })
-            .onMouseUp((e: PointerEvent) => {
-                if (e.button === 0) app.canvas.endBrushStroke(e, true)
-            })
-
-        // other tools
-        this.toolManager.addTool(ToolType.Eyedropper)
-            .onMouseUp(e => {
-                const hex = app.viewport.colorAt(e)
-                brushColor.set(hex)
-            })
-
-        this.toolManager.selectTool(ToolType.Brush)
     }
 
     private addUIIntegrations() {
