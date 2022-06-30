@@ -4,6 +4,8 @@ import { app } from "../App";
 import { ToolType } from "../Interactions/Tools/ToolTypes";
 import { Artist } from "./Artist";
 import { LocalEventSource } from "../Interactions/Events/LocalEventSource";
+import { MessageTypes } from "../../../server/MessageTypes";
+import { EventType } from "../Interactions/Tools/Tool";
 
 export class LocalArtist extends Artist {
 
@@ -12,6 +14,49 @@ export class LocalArtist extends Artist {
 
         this.addActions()
         this.addTools()
+
+        this.test()
+    }
+
+    private test() {
+        this.eventSource.onMouseDown((e) => {
+            const { buttons, button, x, y } = e
+            app.connection.sendMessage(MessageTypes.OnClientEvent, {
+                eventType: EventType.onMouseDown,
+                data: { buttons, button, x, y }
+            })
+        })
+        this.eventSource.onMouseMove((e) => {
+            const { buttons, button, x, y, movementX, movementY } = e
+
+            const test = app.viewport.convertScreenToCanvas(x, y)
+
+            app.connection.sendMessage(MessageTypes.OnClientEvent, {
+                eventType: EventType.onMouseMove,
+                data: { buttons, button, x: test.x, y: test.y, movementX, movementY }
+            })
+        })
+        this.eventSource.onMouseUp((e) => {
+            const { buttons, button, x, y } = e
+            app.connection.sendMessage(MessageTypes.OnClientEvent, {
+                eventType: EventType.onMouseUp,
+                data: { buttons, button, x, y }
+            })
+        })
+        this.eventSource.onKeyboardDown((e) => {
+            const { key } = e
+            app.connection.sendMessage(MessageTypes.OnClientEvent, {
+                eventType: EventType.onKeyboardDown,
+                data: { key }
+            })
+        })
+        this.eventSource.onKeyboardUp((e) => {
+            const { key } = e
+            app.connection.sendMessage(MessageTypes.OnClientEvent, {
+                eventType: EventType.onKeyboardUp,
+                data: { key }
+            })
+        })
     }
 
     private addActions() {

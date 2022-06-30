@@ -5,41 +5,35 @@ import { LocalArtist } from "./Artist/LocalArtist";
 
 type MessageType = typeof MessageTypes[keyof typeof MessageTypes];
 
+type Message = { type: MessageType, body: any }
+type Listener = (message: Message) => void
+
 export class Connection {
 
     public ws: WebSocket = null
-
     public joinURL = ""
+    
+    private listeners: Array<Listener> = []
 
-    private getRoomCode() {
-        const urlParams = new URLSearchParams(window.location.search)
-        return urlParams.get('room')
+    public addMessageListener(listener: Listener) {
+        this.listeners.push(listener)
     }
 
-    connect() {
+    public removeMessageListener(listener: Listener) {
+        this.listeners = this.listeners.filter(l => l !== listener)
+    }
+
+    public connect() {
         this.ws = new WebSocket("ws://localhost:9001/")
         this.ws.onopen = event => {
             this.ws.onmessage = event => {
-                const message = JSON.parse(event.data)
-                switch (message.type) {
-                    case MessageTypes.OnClientConnected:
-                        app.artistManager.addArtist(new RemoteArtist(message.body.id, message.body.color))
-                        break
-                    case MessageTypes.OnClientDisconected:
-                        app.artistManager.removeArtist(message.body)
-                        break
-                    case MessageTypes.GetCurrentState:
-                        app.artistManager.addArtists(message.body.clients.map(artistData => new RemoteArtist(artistData.id, artistData.color)))
-                        break
-                    case MessageTypes.OnSelfConnected:
-                        // TODO: make URL work on production too, not just localhost
-                        this.joinURL = "http://localhost:3000/?room=" + message.body.roomId
-                        app.localArtist.id = message.body.id
-                        app.localArtist.color = message.body.color
-                        app.artistManager.addArtist(new LocalArtist(message.body.id, message.body.color))
-                    default:
-                        console.log(message)
+                const message = JSON.parse(event.data) as Message
+
+                if (message.type === MessageTypes.OnSelfConnected) {
+                    app.connection.joinURL = "http://localhost:3000/?room=" + message.body.roomId
                 }
+
+                this.listeners.forEach(listener => listener(message))
             }
 
             // TODO: move this somewhere else, join/create room screen
@@ -47,12 +41,18 @@ export class Connection {
         }
     }
 
-    disconnect() {
+    public disconnect() {
         this.ws.close()
         this.ws = null
     }
 
-    sendMessage(type: MessageType, message: Object) {
-        this.ws.send(JSON.stringify({ type, body: message }))
+    public sendMessage(type: MessageType, message: Object) {
+        if (this.ws.readyState === this.ws.OPEN)
+            this.ws.send(JSON.stringify({ type, body: message }))
+    }
+
+    private getRoomCode() {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get('room')
     }
 }

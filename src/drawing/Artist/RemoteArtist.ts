@@ -7,7 +7,7 @@ import { Artist } from "./Artist";
 
 export class RemoteArtist extends Artist {
     constructor(id: string, color: string) {
-        super(id, color, new RemoteEventSource())
+        super(id, color, new RemoteEventSource(id))
 
         this.addActions()
         this.addTools()
@@ -18,21 +18,6 @@ export class RemoteArtist extends Artist {
     }
 
     private addActions() {
-        // navigation
-        // pan
-        this.actionManager.addAction(new OnDownTriggerAction([' '], () => this.toolManager.selectTool(ToolType.Pan)))
-        this.actionManager.addAction(new OnUpTriggerAction([' '], () => this.toolManager.selectPreviousTool()))
-        this.actionManager.addAction(new OnDownTriggerAction(['mousemiddle'], () => this.toolManager.selectTool(ToolType.Pan)))
-        this.actionManager.addAction(new OnUpTriggerAction(['mousemiddle'], () => this.toolManager.selectPreviousTool()))
-
-        // zoom
-        this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
-        this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
-        // rotate
-        this.actionManager.addAction(new OnDownTriggerAction(['r'], () => this.toolManager.selectTool(ToolType.Rotate)))
-        this.actionManager.addAction(new OnHoldReleaseTriggerAction(['r'], () => this.toolManager.selectPreviousTool()))
-        this.actionManager.addAction(new OnDownTriggerAction(['arrowleft'], () => app.viewport.rotateLeft()))
-        this.actionManager.addAction(new OnDownTriggerAction(['arrowright'], () => app.viewport.rotateRight()))
         // tools
         this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool(ToolType.Brush)))
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
@@ -41,43 +26,6 @@ export class RemoteArtist extends Artist {
     }
 
     private addTools() {
-        // navigation
-        this.toolManager.addTool(ToolType.Pan)
-            .onMouseMove((e) => {
-                if (e.buttons) {
-                    app.viewport.pan(e)
-                }
-            })
-        this.toolManager.addTool(ToolType.Zoom)
-            .onMouseDown((e) => {
-                app.viewport.scrubbyZoomStart(e)
-            })
-            .onMouseMove((e) => {
-                if (e.buttons) {
-                    app.viewport.scrubbyZoomUpdate(e)
-                }
-            })
-            .onMouseUp((e) => {
-                app.viewport.scrubbyZoomEnd(e)
-            })
-
-        this.toolManager.addTool(ToolType.WheelZoom, true)
-            .onWheel((e: WheelEvent) => {
-                app.viewport.wheelZoom(e)
-            })
-        this.toolManager.addTool(ToolType.Rotate)
-            .onMouseDown((e) => {
-                app.viewport.scrubbyRotateStart(e)
-            })
-            .onMouseMove((e) => {
-                if (e.buttons) {
-                    app.viewport.scrubbyRotateUpdate(e)
-                }
-            })
-            .onMouseUp((e) => {
-                app.viewport.scrubbyRotateEnd(e)
-            })
-
         // painting
         this.toolManager.addTool(ToolType.Brush)
             .onMouseDown((e: PointerEvent) => {
@@ -98,7 +46,7 @@ export class RemoteArtist extends Artist {
                 if (e.button === 0) app.canvas.startBrushStroke(e, true)
             })
             .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStroke(e, true)
+                app.canvas.updateBrushStrokeTest(e, true)
             })
             .onMouseUp((e: PointerEvent) => {
                 if (e.button === 0) app.canvas.endBrushStroke(e, true)

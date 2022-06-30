@@ -1,47 +1,76 @@
+import { MessageTypes } from "../../../../server/MessageTypes";
+import { app } from "../../App";
+import { EventType } from "../Tools/Tool";
 import type { IEventSource } from "./IEventSource";
 
 export class RemoteEventSource implements IEventSource {
-    private mouseDownAction: (e: PointerEvent) => any = () => {}
-    private mouseUpAction: (e: PointerEvent) => any = () => {}
-    private mouseMoveAction: (e: PointerEvent) => any = () => {}
-    private keyboardUpAction: (e: KeyboardEvent) => any = () => {}
-    private keyboardDownAction: (e: KeyboardEvent) => any = () => {}
-    private wheelAction: (e: WheelEvent) => any = () => {}
 
-    constructor() {
-        // app.ref.addEventListener('pointerdown', (e) => this.mouseDownAction(e))
-        // app.ref.addEventListener('pointerup', (e) => this.mouseUpAction(e))
-        // app.ref.addEventListener('pointermove', (e) => this.mouseMoveAction(e))
-        // window.addEventListener('keyup', (e) => this.keyboardUpAction(e))
-        // window.addEventListener('keydown', (e) => this.keyboardDownAction(e))
-        // window.addEventListener('wheel', (e) => this.wheelAction(e))
+    private mouseDownActions: Array<(e: PointerEvent) => any> = []
+    private mouseUpActions: Array<(e: PointerEvent) => any> = []
+    private mouseMoveActions: Array<(e: PointerEvent) => any> = []
+    private keyboardUpActions: Array<(e: KeyboardEvent) => any> = []
+    private keyboardDownActions: Array<(e: KeyboardEvent) => any> = []
+    private wheelActions: Array<(e: WheelEvent) => any> = []
+
+    private handler: (message: any) => void
+
+    constructor(public artistId: string) {
+        this.handler = (message) => {
+            const { type, body } = message
+            if (type === MessageTypes.OnClientEvent &&
+                this.artistId === body.client.id &&
+                this.artistId !== app.artistManager.localArtist.id
+            ) {
+                switch (body.event.eventType) {
+                    case EventType.onMouseDown:
+                        this.mouseDownActions.forEach(action => action(body.event.data))
+                        break
+                    case EventType.onMouseMove:
+                        this.mouseMoveActions.forEach(action => action(body.event.data))
+                        break
+                    case EventType.onMouseUp:
+                        this.mouseUpActions.forEach(action => action(body.event.data))
+                        break
+                    case EventType.onKeyboardUp:
+                        this.keyboardUpActions.forEach(action => action(body.event.data))
+                        break
+                    case EventType.onKeyboardDown:
+                        this.keyboardDownActions.forEach(action => action(body.event.data))
+                        break
+                    case EventType.onWheel:
+                        this.wheelActions.forEach(action => action(body.event.data))
+                        break
+                }
+            }
+        }
+        app.connection.addMessageListener(this.handler)
     }
 
     destroy(): void {
-
+        app.connection.removeMessageListener(this.handler)
     }
-    
+
     onMouseDown(action: (e: PointerEvent) => any): void {
-        this.mouseDownAction = action
+        this.mouseDownActions.push(action)
     }
     
     onMouseUp(action: (e: PointerEvent) => any): void {
-        this.mouseUpAction = action
+        this.mouseUpActions.push(action)
     }
     
     onMouseMove(action: (e: PointerEvent) => any): void {
-        this.mouseMoveAction = action
+        this.mouseMoveActions.push(action)
     }
     
     onKeyboardUp(action: (e: KeyboardEvent) => any): void {
-        this.keyboardUpAction = action
+        this.keyboardUpActions.push(action)
     }
     
     onKeyboardDown(action: (e: KeyboardEvent) => any): void {
-        this.keyboardDownAction = action
+        this.keyboardDownActions.push(action)
     }
 
     onWheel(action: (e: WheelEvent) => any): void {
-        this.wheelAction = action
+        this.wheelActions.push(action)
     };
 }

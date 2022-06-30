@@ -97,6 +97,14 @@ export class Canvas {
         }
     }
 
+    updateBrushStrokeTest(e: PointerEvent, erase: boolean = false) {
+        if (this.pointerDown) {
+            const { x, y } = e
+            // const adjusted = app.viewport.convertScreenToCanvas(x, y)
+            this.liveBrushStroke.addNode(x, y, e.pressure)
+        }
+    }
+
     endBrushStroke(_: PointerEvent, erase: boolean = false) {
         this.pointerDown = false
         

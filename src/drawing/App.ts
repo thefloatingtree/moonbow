@@ -1,10 +1,6 @@
 import * as PIXI from 'pixi.js'
-import { OnDownTriggerAction, OnHoldReleaseTriggerAction, OnUpTriggerAction } from './Interactions/Actions/Actions'
-import { ActionManager } from './Interactions/Actions/ActionManager'
 import { Canvas } from './Canvas/Canvas'
-import { ToolManager } from './Interactions/Tools/ToolManager'
 import { Viewport } from './Viewport'
-import { ToolType } from './Interactions/Tools/ToolTypes'
 import { RenderTexturePool } from './Util/RenderTexturePool'
 import { brushColor, brushHardness, brushOpacity, brushSize, brushSpacing, brushTipType } from '../lib/stores/brushSettings'
 import { colorPickerStore } from '../lib/stores/colorPicker'
@@ -12,8 +8,6 @@ import { BrushManager } from './Brush/BrushManager'
 import { eraserHardness, eraserOpacity, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
 import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
-import { EventType } from './Interactions/Tools/Tool'
-import { LocalArtist } from './Artist/LocalArtist'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -24,8 +18,6 @@ export class App {
     public brushManager: BrushManager
     public connection: Connection
     public artistManager: ArtistManager
-
-    public localArtist: LocalArtist
 
     private afterInitCallbacks: Array<Function> = []
 
@@ -40,14 +32,12 @@ export class App {
         this.canvas = new Canvas()
         this.viewport = new Viewport(this.canvas)
         this.brushManager = new BrushManager()
-
         this.artistManager = new ArtistManager()
         this.connection = new Connection()
 
-        this.localArtist = new LocalArtist("test", "#FFFFFF")
-
         this.addUIIntegrations()
 
+        this.artistManager.addListeners()
         this.connection.connect()
 
         this.application.stage.addChild(this.viewport.container)
