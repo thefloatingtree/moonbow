@@ -1,4 +1,5 @@
 export enum ToolType {
+    None,
     Brush,
     Eraser,
     Select,
