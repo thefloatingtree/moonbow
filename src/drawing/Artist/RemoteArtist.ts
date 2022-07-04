@@ -34,7 +34,7 @@ export class RemoteArtist extends Artist {
                 }
             })
             .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStroke(e)
+                app.canvas.updateBrushStrokeWithPointInCanvasSpace(e)
             })
             .onMouseUp((e: PointerEvent) => {
                 if (e.button === 0) {
@@ -46,7 +46,7 @@ export class RemoteArtist extends Artist {
                 if (e.button === 0) app.canvas.startBrushStroke(e, true)
             })
             .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStrokeTest(e, true)
+                app.canvas.updateBrushStrokeWithPointInCanvasSpace(e, true)
             })
             .onMouseUp((e: PointerEvent) => {
                 if (e.button === 0) app.canvas.endBrushStroke(e, true)

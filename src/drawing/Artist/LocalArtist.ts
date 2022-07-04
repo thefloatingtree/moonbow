@@ -15,10 +15,10 @@ export class LocalArtist extends Artist {
         this.addActions()
         this.addTools()
 
-        this.test()
+        this.setupRemote()
     }
 
-    private test() {
+    private setupRemote() {
         this.eventSource.onMouseDown((e) => {
             const { buttons, button, x, y } = e
             app.connection.sendMessage(MessageTypes.OnClientEvent, {
@@ -29,11 +29,11 @@ export class LocalArtist extends Artist {
         this.eventSource.onMouseMove((e) => {
             const { buttons, button, x, y, movementX, movementY } = e
 
-            const test = app.viewport.convertScreenToCanvas(x, y)
+            const pointInCanvasSpace = app.viewport.convertScreenToCanvas(x, y)
 
             app.connection.sendMessage(MessageTypes.OnClientEvent, {
                 eventType: EventType.onMouseMove,
-                data: { buttons, button, x: test.x, y: test.y, movementX, movementY }
+                data: { buttons, button, x: pointInCanvasSpace.x, y: pointInCanvasSpace.y, movementX, movementY }
             })
         })
         this.eventSource.onMouseUp((e) => {
@@ -68,8 +68,8 @@ export class LocalArtist extends Artist {
         this.actionManager.addAction(new OnUpTriggerAction(['mousemiddle'], () => this.toolManager.selectPreviousTool()))
 
         // zoom
-        this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
-        this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
+        // this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
+        // this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
         // rotate
         this.actionManager.addAction(new OnDownTriggerAction(['r'], () => this.toolManager.selectTool(ToolType.Rotate)))
         this.actionManager.addAction(new OnHoldReleaseTriggerAction(['r'], () => this.toolManager.selectPreviousTool()))
