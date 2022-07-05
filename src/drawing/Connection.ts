@@ -12,6 +12,8 @@ export class Connection {
 
     public ws: WebSocket = null
     public joinURL = ""
+
+    public websocketURL = window.location.href.replace(window.location.protocol, 'ws:')
     
     private listeners: Array<Listener> = []
 
@@ -24,13 +26,13 @@ export class Connection {
     }
 
     public connect() {
-        this.ws = new WebSocket("ws://localhost:9001/")
+        this.ws = new WebSocket(this.websocketURL)
         this.ws.onopen = event => {
             this.ws.onmessage = event => {
                 const message = JSON.parse(event.data) as Message
 
                 if (message.type === MessageTypes.OnSelfConnected) {
-                    app.connection.joinURL = "http://localhost:3000/?room=" + message.body.roomId
+                    this.joinURL = `${window.location.origin}/?room=${message.body.roomId}`
                 }
 
                 this.listeners.forEach(listener => listener(message))
