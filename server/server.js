@@ -15,7 +15,7 @@ export const app = App()
         close: onClientDisconnect
     })
     .get("/*", serveStatic)
-    .listen(PORT, (listenSocket) => {
+    .listen('0.0.0.0', PORT, (listenSocket) => {
         if (listenSocket) {
             console.log(`Listening on port ${PORT}`);
         }
