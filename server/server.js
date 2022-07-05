@@ -4,11 +4,10 @@ import { serveDir } from 'uwebsocket-serve';
 import path from 'path'
 
 export const rooms = new Map()
-const PORT = 5000
+const PORT = process.env.PORT || 5000
 
-const publicPath = path.resolve('./dist');
-console.log(publicPath)
-const serveStatic = serveDir(publicPath);
+const publicPath = path.resolve('./dist')
+const serveStatic = serveDir(publicPath)
 
 export const app = App()
     .ws('/*', {
