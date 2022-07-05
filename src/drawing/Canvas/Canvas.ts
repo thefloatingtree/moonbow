@@ -33,10 +33,10 @@ export class Canvas {
         hardness: 2
     }
 
-    
+
     private liveBrushStroke: BrushStroke
     private pointerDown: boolean
-    
+
     private activeLayer: Layer
 
     // private undoStack: Array<PIXI.Sprite> = []
@@ -106,9 +106,47 @@ export class Canvas {
 
     endBrushStroke(_: PointerEvent, erase: boolean = false) {
         this.pointerDown = false
-        
+
         this.activeLayer.addBrushStroke(this.liveBrushStroke.container)
         this.container.removeChild(this.liveBrushStroke.container)
+    }
+
+    exportToPNG() {
+        const renderTexture = app.renderTexturePool.acquire(this.settings.width, this.settings.height)
+        app.application.renderer.render(this.container, { renderTexture })
+
+        const canvas: HTMLCanvasElement = app.application.renderer.plugins.extract.canvas(new PIXI.Sprite(renderTexture))
+
+        app.renderTexturePool.release(renderTexture)
+
+        canvas.toBlob((blob) => {
+            const a = document.createElement('a')
+            document.body.append(a)
+            a.download = "export.png"
+            a.href = URL.createObjectURL(blob)
+            a.click()
+            a.remove()
+        }, 'image/png')
+
+    }
+
+    exportToJPEG() {
+        const renderTexture = app.renderTexturePool.acquire(this.settings.width, this.settings.height)
+        app.application.renderer.render(this.container, { renderTexture })
+
+        const canvas: HTMLCanvasElement = app.application.renderer.plugins.extract.canvas(new PIXI.Sprite(renderTexture))
+
+        app.renderTexturePool.release(renderTexture)
+
+        canvas.toBlob((blob) => {
+            const a = document.createElement('a')
+            document.body.append(a)
+            a.download = "export.jpeg"
+            a.href = URL.createObjectURL(blob)
+            a.click()
+            a.remove()
+        }, 'image/jpeg')
+
     }
 }
 

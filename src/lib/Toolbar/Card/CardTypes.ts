@@ -4,5 +4,6 @@ export enum CardType {
     Brush,
     Eraser,
     Home,
-    Collaborators
+    Collaborators,
+    Export
 }
