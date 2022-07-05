@@ -1,1 +1,1 @@
-web: npm run prod
+worker: yarn prod
