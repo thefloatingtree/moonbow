@@ -2,10 +2,10 @@ import * as PIXI from 'pixi.js'
 import { Canvas } from './Canvas/Canvas'
 import { Viewport } from './Viewport'
 import { RenderTexturePool } from './Util/RenderTexturePool'
-import { brushColor, brushHardness, brushOpacity, brushSize, brushSpacing, brushTipType } from '../lib/stores/brushSettings'
+import { brushColor, brushHardness, brushOpacity, brushSettings, brushSize, brushSpacing, brushTipType } from '../lib/stores/brushSettings'
 import { colorPickerStore } from '../lib/stores/colorPicker'
 import { BrushManager } from './Brush/BrushManager'
-import { eraserHardness, eraserOpacity, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
+import { eraserHardness, eraserOpacity, eraserSettings, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
 import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
 
@@ -35,11 +35,12 @@ export class App {
         this.artistManager = new ArtistManager()
         this.connection = new Connection()
 
-        this.addUIIntegrations()
-
+        
         this.artistManager.addListeners()
         this.connection.connect()
 
+        this.addUIIntegrations()
+        
         this.application.stage.addChild(this.viewport.container)
         this.application.start()
 
@@ -69,12 +70,7 @@ export class App {
         brushSpacing.set(app.canvas.brushSettings.spacing)
         brushTipType.set(app.canvas.brushSettings.tipType)
 
-        brushColor.subscribe((color) => (app.canvas.brushSettings.color = color))
-        brushOpacity.subscribe((opacity) => (app.canvas.brushSettings.opacity = opacity))
-        brushSize.subscribe((size) => (app.canvas.brushSettings.size = size))
-        brushHardness.subscribe((hardness) => (app.canvas.brushSettings.hardness = hardness))
-        brushSpacing.subscribe((spacing) => (app.canvas.brushSettings.spacing = spacing))
-        brushTipType.subscribe((tipType) => (app.canvas.brushSettings.tipType = tipType))
+        brushSettings.subscribe((brushSettings) => app.artistManager.localArtist.changeBrushSettings(brushSettings))
 
         eraserOpacity.set(app.canvas.eraserSettings.opacity)
         eraserSize.set(app.canvas.eraserSettings.size)
@@ -82,11 +78,7 @@ export class App {
         eraserSpacing.set(app.canvas.eraserSettings.spacing)
         eraserTipType.set(app.canvas.eraserSettings.tipType)
 
-        eraserOpacity.subscribe((opacity) => (app.canvas.eraserSettings.opacity = opacity))
-        eraserSize.subscribe((size) => (app.canvas.eraserSettings.size = size))
-        eraserHardness.subscribe((hardness) => (app.canvas.eraserSettings.hardness = hardness))
-        eraserSpacing.subscribe((spacing) => (app.canvas.eraserSettings.spacing = spacing))
-        eraserTipType.subscribe((tipType) => (app.canvas.eraserSettings.tipType = tipType))
+        eraserSettings.subscribe((eraserSettings) => app.artistManager.localArtist.changeEraserSettings(eraserSettings))
     }
 }
 

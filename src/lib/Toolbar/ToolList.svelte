@@ -29,7 +29,7 @@
         }
 
         selectedTool = toolType;
-        app.artistManager.localArtist.toolManager.selectTool(selectedTool);
+        app.artistManager.localArtist.changeTool(toolType);
     }
 
     onMount(() => {

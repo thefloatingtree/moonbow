@@ -6,8 +6,8 @@ import { LocalArtist } from "./LocalArtist";
 import { RemoteArtist } from "./RemoteArtist";
 
 export class ArtistManager {
-    public remoteArtists: Array<Artist> = []
-    public localArtist: Artist = new LocalArtist("local", "#FFFFFF")
+    public remoteArtists: Array<RemoteArtist> = []
+    public localArtist: LocalArtist = new LocalArtist("local", "#FFFFFF")
 
     constructor() {
         artists.subscribe(console.log)
@@ -36,7 +36,7 @@ export class ArtistManager {
 
     public addRemoteArtist(artist: Artist) {
         this.removeRemoteArtist(artist)
-        this.remoteArtists.push(artist)
+        this.remoteArtists.push(artist as RemoteArtist)
         artists.set(this.remoteArtists)
     }
 

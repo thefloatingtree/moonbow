@@ -1,3 +1,4 @@
+import { MessageTypes } from "../../../server/MessageTypes";
 import { brushColor } from "../../../src/lib/stores/brushSettings";
 import { app } from "../App";
 import { OnDownTriggerAction, OnUpTriggerAction, OnHoldReleaseTriggerAction } from "../Interactions/Actions/Actions";
@@ -11,10 +12,37 @@ export class RemoteArtist extends Artist {
 
         this.addActions()
         this.addTools()
+
+        this.setupRemote()
     }
 
     destroy(): void {
         this.eventSource.destroy()
+        app.connection.removeMessageListener(this.handleToolChangeEvent.bind(this))
+    }
+
+    private handleToolChangeEvent(message: any) {
+        const { type, body } = message
+        if (type === MessageTypes.OnClientToolUpdate &&
+            this.id === body.client.id &&
+            this.id !== app.artistManager.localArtist.id
+            ) {
+                switch (body.event.eventType) {
+                    case 'TOOL_TYPE_CHANGE':
+                        this.toolManager.selectTool(body.event.data.toolType)
+                        break
+                    case 'BRUSH_SETTINGS_CHANGE':
+                        this.brushSettings = body.event.data.brushSettings
+                        break
+                    case 'ERASER_SETTINGS_CHANGE':
+                        this.eraserSettings = body.event.data.eraserSettings
+                        break
+                }
+            }
+    }
+
+    private setupRemote() {
+        app.connection.addMessageListener(this.handleToolChangeEvent.bind(this))
     }
 
     private addActions() {
@@ -45,26 +73,26 @@ export class RemoteArtist extends Artist {
         this.toolManager.addTool(ToolType.Brush)
             .onMouseDown((e: PointerEvent) => {
                 if (e.button === 0) {
-                    app.canvas.startBrushStroke(e)
+                    app.canvas.startBrushStroke(e, this)
                 }
             })
             .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStrokeWithPointInCanvasSpace(e)
+                app.canvas.updateBrushStrokeWithPointInCanvasSpace(e, this)
             })
             .onMouseUp((e: PointerEvent) => {
                 if (e.button === 0) {
-                    app.canvas.endBrushStroke(e)
+                    app.canvas.endBrushStroke(e, this)
                 }
             })
         this.toolManager.addTool(ToolType.Eraser)
             .onMouseDown((e: PointerEvent) => {
-                if (e.button === 0) app.canvas.startBrushStroke(e, true)
+                if (e.button === 0) app.canvas.startBrushStroke(e, this, true)
             })
             .onMouseMove((e: PointerEvent) => {
-                app.canvas.updateBrushStrokeWithPointInCanvasSpace(e, true)
+                app.canvas.updateBrushStrokeWithPointInCanvasSpace(e, this, true)
             })
             .onMouseUp((e: PointerEvent) => {
-                if (e.button === 0) app.canvas.endBrushStroke(e, true)
+                if (e.button === 0) app.canvas.endBrushStroke(e, this, true)
             })
 
         // other tools

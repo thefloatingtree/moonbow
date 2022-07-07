@@ -16,11 +16,8 @@ export function onClientMessage(ws, message) {
         case MessageTypes.GetCurrentState:
             sendCurrentState(ws)
             break
-        case MessageTypes.OnClientEvent:
-            sendClientEvent(data, ws)
-            break
         default:
-            console.log(data)
+            rebroadcast(data, ws)
     }
 }
 
@@ -37,6 +34,21 @@ export function onClientDisconnect(ws) {
         body: {
             id: ws.id,
             color: ws.color
+        }
+    }))
+}
+
+export function rebroadcast(data, ws) {
+    if (socketNotInRoom(ws)) return
+
+    app.publish(`${ws.roomId}/${MessageTypes.OnClientMessage}`, JSON.stringify({
+        type: data.type,
+        body: {
+            client: {
+                id: ws.id,
+                roomId: ws.roomId,
+            },
+            event: data.body
         }
     }))
 }

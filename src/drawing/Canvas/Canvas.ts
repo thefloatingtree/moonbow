@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js'
 import type { BrushSettings } from 'src/models/BrushSettings'
 import { handle_promise } from 'svelte/internal'
 import { app } from '../App'
+import type { Artist } from '../Artist/Artist'
 import type { Brush } from '../Brush/Brush'
 import { BrushStroke } from '../Brush/BrushStroke'
 import { Layer } from './Layer'
@@ -33,6 +34,8 @@ export class Canvas {
         hardness: 2
     }
 
+
+    private liveBrushStrokes: Map<string, { brushStroke: BrushStroke, pointerDown: Boolean }> = new Map()
 
     private liveBrushStroke: BrushStroke
     private pointerDown: boolean
@@ -79,36 +82,49 @@ export class Canvas {
     //     console.log({ u: this.undoStack, r: this.redoStack })
     // }
 
-    startBrushStroke(_: PointerEvent, erase: boolean = false) {
-        this.pointerDown = true
-
-        const settings = erase ? this.eraserSettings : this.brushSettings
+    startBrushStroke(_: PointerEvent, artist: Artist, erase: boolean = false) {        
+        const settings = erase ? artist.eraserSettings : artist.brushSettings
         const brush = app.brushManager.getBrush(settings)
+        
+        const brushStroke = new BrushStroke(brush)
+        this.container.addChild(brushStroke.container)
 
-        this.liveBrushStroke = new BrushStroke(brush)
-        this.container.addChild(this.liveBrushStroke.container)
+        this.liveBrushStrokes.set(artist.id, { brushStroke, pointerDown: true })
     }
 
-    updateBrushStroke(e: PointerEvent, erase: boolean = false) {
-        if (this.pointerDown) {
+    updateBrushStroke(e: PointerEvent, artist: Artist, erase: boolean = false) {
+
+        if (!this.liveBrushStrokes.get(artist.id)) return
+
+        const { brushStroke, pointerDown } = this.liveBrushStrokes.get(artist.id)
+
+        if (pointerDown) {
             const { x, y } = e
             const pointInCanvasSpace = app.viewport.convertScreenToCanvas(x, y)
-            this.liveBrushStroke.addNode(pointInCanvasSpace.x, pointInCanvasSpace.y, e.pressure)
+            brushStroke.addNode(pointInCanvasSpace.x, pointInCanvasSpace.y, e.pressure)
         }
     }
 
-    updateBrushStrokeWithPointInCanvasSpace(e: PointerEvent, erase: boolean = false) {
-        if (this.pointerDown) {
+    updateBrushStrokeWithPointInCanvasSpace(e: PointerEvent, artist: Artist, erase: boolean = false) {
+
+        if (!this.liveBrushStrokes.get(artist.id)) return
+
+        const { brushStroke, pointerDown } = this.liveBrushStrokes.get(artist.id)
+
+        if (pointerDown) {
             const { x, y } = e
-            this.liveBrushStroke.addNode(x, y, e.pressure)
+            brushStroke.addNode(x, y, e.pressure)
         }
     }
 
-    endBrushStroke(_: PointerEvent, erase: boolean = false) {
-        this.pointerDown = false
+    endBrushStroke(_: PointerEvent, artist: Artist, erase: boolean = false) {
 
-        this.activeLayer.addBrushStroke(this.liveBrushStroke.container)
-        this.container.removeChild(this.liveBrushStroke.container)
+        const { brushStroke } = this.liveBrushStrokes.get(artist.id)
+
+        this.activeLayer.addBrushStroke(brushStroke.container)
+        this.container.removeChild(brushStroke.container)
+
+        this.liveBrushStrokes.set(artist.id, { brushStroke, pointerDown: false })
     }
 
     exportToPNG() {
