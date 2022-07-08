@@ -2,7 +2,6 @@ import type { BrushSettings } from "src/models/BrushSettings";
 import { app } from "../App";
 import { ActionManager } from "../Interactions/Actions/ActionManager";
 import type { IEventSource } from "../Interactions/Events/IEventSource";
-import { LocalEventSource } from "../Interactions/Events/LocalEventSource";
 import { ToolManager } from "../Interactions/Tools/ToolManager";
 
 export abstract class Artist {

@@ -1,14 +1,14 @@
 <script lang="ts">
-    import ToolbarIcon from "./ToolbarIcon.svelte";
-    import ToolbarCard from "./Card/ToolbarCard.svelte";
+    import FaArrowLeft from 'svelte-icons/fa/FaArrowLeft.svelte';
     import FaBars from "svelte-icons/fa/FaBars.svelte";
-    import FaArrowLeft from 'svelte-icons/fa/FaArrowLeft.svelte'
-    import { ignoreNextClickOutside, toggleCard, toggleCardWithinCard } from "./Card/CardState";
-    import { CardType } from "./Card/CardTypes";
-    import { artists } from "../stores/artists";
     import { app } from "../../drawing/App";
-import { isHome } from "../stores/navigation";
-import ThreeDotLoader from "../Common/ThreeDotLoader.svelte";
+    import ThreeDotLoader from "../Common/ThreeDotLoader.svelte";
+    import { artists } from "../stores/artists";
+    import { isHome } from "../stores/navigation";
+    import { toggleCard,toggleCardWithinCard } from "./Card/CardState";
+    import { CardType } from "./Card/CardTypes";
+    import ToolbarCard from "./Card/ToolbarCard.svelte";
+    import ToolbarIcon from "./ToolbarIcon.svelte";
 
     let inviteButtonText = "Copy link to sketch"
     let timeout = null

@@ -1,7 +1,4 @@
-import { app } from "./App"
-import { MessageTypes } from '../../server/MessageTypes'
-import { RemoteArtist } from "./Artist/RemoteArtist";
-import { LocalArtist } from "./Artist/LocalArtist";
+import { MessageTypes } from '../../server/MessageTypes';
 
 type MessageType = typeof MessageTypes[keyof typeof MessageTypes];
 

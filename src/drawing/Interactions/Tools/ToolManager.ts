@@ -1,4 +1,3 @@
-import { app } from "../../App"
 import type { IEventSource } from "../Events/IEventSource"
 import { EventType, Tool } from "./Tool"
 import type { ToolType } from "./ToolTypes"

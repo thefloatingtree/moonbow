@@ -1,6 +1,6 @@
 <script lang="ts">
     import Collaborators from "./CollaboratorList.svelte";
-import ToolList from "./ToolList.svelte";
+    import ToolList from "./ToolList.svelte";
 </script>
 
 <div class="absolute flex space-x left-3 top-3 bottom-3">

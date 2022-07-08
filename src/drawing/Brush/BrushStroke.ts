@@ -1,6 +1,4 @@
 import * as PIXI from 'pixi.js'
-import type { BrushSettings } from 'src/models/BrushSettings'
-import { app } from '../App'
 import { Easing, lerp } from '../util'
 import type { Brush } from './Brush'
 import { SmoothStroke } from './SmothStroke'

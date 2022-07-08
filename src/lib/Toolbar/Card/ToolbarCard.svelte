@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { fly } from "svelte/transition";
     import clickOutside from "svelte-outside-click";
-    import { createEventDispatcher } from "svelte";
-    import { activeCard, handleClickOutsideCard } from "./CardState";
+    import { fly } from "svelte/transition";
+    import { activeCard,handleClickOutsideCard } from "./CardState";
     import type { CardType } from "./CardTypes";
-
-    const dispatch = createEventDispatcher();
 
     export let cardType: CardType;
     export let snapBottom = false;

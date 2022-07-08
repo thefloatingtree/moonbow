@@ -1,9 +1,7 @@
 import * as PIXI from 'pixi.js'
 import type { BrushSettings } from 'src/models/BrushSettings'
-import { handle_promise } from 'svelte/internal'
 import { app } from '../App'
 import type { Artist } from '../Artist/Artist'
-import type { Brush } from '../Brush/Brush'
 import { BrushStroke } from '../Brush/BrushStroke'
 import { Layer } from './Layer'
 

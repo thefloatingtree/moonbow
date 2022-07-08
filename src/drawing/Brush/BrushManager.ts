@@ -1,4 +1,3 @@
-import * as PIXI from 'pixi.js'
 import type { BrushSettings } from 'src/models/BrushSettings'
 import { Brush } from './Brush'
 

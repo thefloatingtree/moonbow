@@ -1,7 +1,6 @@
-import type { DisplayObject } from 'pixi.js'
 import * as PIXI from 'pixi.js'
 import { app } from '../App'
-import { frag, renderAsSprite } from '../util'
+import { renderAsSprite } from '../util'
 import type { Canvas } from './Canvas'
 
 // const fShader = frag`

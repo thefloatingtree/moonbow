@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { app } from '../App'
 
 export class RenderTexturePool {
     private renderTextures: Map<string, Array<PIXI.RenderTexture>> = new Map()
