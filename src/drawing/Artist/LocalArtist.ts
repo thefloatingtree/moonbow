@@ -10,8 +10,8 @@ import type { BrushSettings } from "src/models/BrushSettings";
 
 export class LocalArtist extends Artist {
 
-    constructor(id: string, color: string) {
-        super(id, color, new LocalEventSource())
+    constructor(id: string, name: string, owner: boolean, color: string) {
+        super(id, name, owner, color, new LocalEventSource())
 
         this.addActions()
         this.addTools()

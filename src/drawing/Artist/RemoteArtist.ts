@@ -7,8 +7,8 @@ import { ToolType } from "../Interactions/Tools/ToolTypes";
 import { Artist } from "./Artist";
 
 export class RemoteArtist extends Artist {
-    constructor(id: string, color: string) {
-        super(id, color, new RemoteEventSource(id))
+    constructor(id: string, name: string, owner: boolean, color: string) {
+        super(id, name, owner, color, new RemoteEventSource(id))
 
         this.addActions()
         this.addTools()

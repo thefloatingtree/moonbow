@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { MessageTypes } from './MessageTypes.js'
 import { app, rooms } from './server.js'
 import { colors } from './colors.js'
+import { names } from './names.js'
 
 export function socketNotInRoom(socket) {
     return !socket.roomId
@@ -29,11 +30,29 @@ export function onClientDisconnect(ws) {
     const room = rooms.get(roomId)
     rooms.set(roomId, room.filter(socket => socket.id !== ws.id))
 
+    let ownerId = null
+
+    if (ws.owner) {
+        ws.owner = false
+
+        const newOwner = rooms.get(roomId).find(socket => socket.owner !== true)
+
+        if (newOwner) {
+            newOwner.owner = true
+            ownerId = newOwner.id
+        } else {
+            rooms.delete(roomId)
+        }
+    }
+
     app.publish(`${roomId}/${MessageTypes.OnClientDisconected}`, JSON.stringify({
         type: MessageTypes.OnClientDisconected,
         body: {
             id: ws.id,
-            color: ws.color
+            color: ws.color,
+            name: ws.name,
+            owner: ws.owner,
+            ownerId,
         }
     }))
 }
@@ -80,7 +99,9 @@ export function sendCurrentState(ws) {
                 return {
                     id: socket.id,
                     roomId: socket.roomId,
-                    color: socket.color
+                    name: socket.name,
+                    owner: socket.owner,
+                    color: socket.color,
                 }
             })
         }
@@ -97,9 +118,11 @@ export function connectToRoom(data, ws) {
         // Join pre existing room
         const room = rooms.get(data.body.roomId)
         rooms.set(roomId, [...room, ws])
+        ws.owner = false
     } else {
         // Create a new room
         rooms.set(roomId, [ws])
+        ws.owner = true
     }
     
     const room = rooms.get(roomId)
@@ -107,6 +130,7 @@ export function connectToRoom(data, ws) {
     ws.roomId = roomId
     ws.id = uuid()
     ws.color = colors[room.length]
+    ws.name = names[room.length]
 
     ws.subscribe(`${roomId}/${MessageTypes.OnClientConnected}`)
     ws.subscribe(`${roomId}/${MessageTypes.OnClientDisconected}`)
@@ -117,7 +141,9 @@ export function connectToRoom(data, ws) {
         body: {
             id: ws.id,
             roomId: ws.roomId,
-            color: ws.color
+            name: ws.name,
+            owner: ws.owner,
+            color: ws.color,
         }
     }))
 
@@ -126,7 +152,9 @@ export function connectToRoom(data, ws) {
         body: {
             id: ws.id,
             roomId: ws.roomId,
-            color: ws.color
+            name: ws.name,
+            owner: ws.owner,
+            color: ws.color,
         }
     }))
 

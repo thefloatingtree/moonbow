@@ -28,6 +28,8 @@ export abstract class Artist {
 
     constructor(
         public id: string,
+        public name: string,
+        public owner: boolean,
         public color: string,
         protected eventSource: IEventSource
     ) {
