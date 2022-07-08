@@ -113,6 +113,8 @@ export function connectToRoom(data, ws) {
     // Joining an existing room if roomId is provided and exists
     const isJoining = !!data.body?.roomId && rooms.get(data.body.roomId)
     const roomId = isJoining ? data.body.roomId : uuid()
+
+    const name = !!data.body?.name ? data.body.name : names[room.length]
     
     if (isJoining) {
         // Join pre existing room
@@ -130,7 +132,7 @@ export function connectToRoom(data, ws) {
     ws.roomId = roomId
     ws.id = uuid()
     ws.color = colors[room.length]
-    ws.name = names[room.length]
+    ws.name = name
 
     ws.subscribe(`${roomId}/${MessageTypes.OnClientConnected}`)
     ws.subscribe(`${roomId}/${MessageTypes.OnClientDisconected}`)

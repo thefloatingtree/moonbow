@@ -34,13 +34,14 @@ export class Connection {
 
                 if (message.type === MessageTypes.OnSelfConnected) {
                     this.joinURL = `${window.location.origin}/?room=${message.body.roomId}`
+                    window.history.pushState("", "", `/?room=${message.body.roomId}`)
                 }
 
                 this.listeners.forEach(listener => listener(message))
             }
 
             // TODO: move this somewhere else, join/create room screen
-            this.ws.send(JSON.stringify({ type: MessageTypes.JoinRoom, body: { roomId: this.getRoomCode() } }))
+            this.ws.send(JSON.stringify({ type: MessageTypes.JoinRoom, body: { roomId: this.getRoomCode(), name: JSON.parse(localStorage.getItem('username')) } }))
         }
     }
 

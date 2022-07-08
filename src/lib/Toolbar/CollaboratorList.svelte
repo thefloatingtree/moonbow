@@ -7,6 +7,8 @@
     import { CardType } from "./Card/CardTypes";
     import { artists } from "../stores/artists";
     import { app } from "../../drawing/App";
+import { isHome } from "../stores/navigation";
+import ThreeDotLoader from "../Common/ThreeDotLoader.svelte";
 
     let inviteButtonText = "Copy link to sketch"
     let timeout = null
@@ -19,17 +21,27 @@
             inviteButtonText = "Copy link to sketch"
         }, 2000)
     }
+
+    function onLeaveSketch() {
+        window.history.pushState("", "", "/")
+        $isHome = true
+    }
     
 </script>
 
 <div class="flex flex-col items-center space-y">
     <ToolbarCard cardType={CardType.Collaborators} snapBottom>
-        <div on:click={() => toggleCard(CardType.Collaborators)} class="flex flex-col-reverse space-y-1 space-y-reverse hover:bg-[#4e4e4e] cursor-pointer rounded-full p-1 transition-all">
+        <div on:click={() => toggleCard(CardType.Collaborators)} class="flex flex-col-reverse space-y-2 space-y-reverse hover:bg-[#4e4e4e] cursor-pointer rounded-full p-1 transition-all">
             {#each $artists as artist}
-                <div class="w-8 aspect-square rounded-full flex items-center justify-center" style="background-color: {artist.color};">
+                <div class="w-8 h-8 aspect-square rounded-full flex items-center justify-center" style="background-color: {artist.color};">
                     <p class="font-medium text-lg select-none">{artist.name[0]}</p>
                 </div>
             {/each}
+            {#if $artists.length === 0}
+                <div class="w-8 h-8 p-2 aspect-square rounded-full flex items-center justify-center bg-[#4e4e4e]">
+                    <ThreeDotLoader />
+                </div>
+            {/if}
         </div>
         <div class="space-y-3" slot="content">
             <div class="text-white select-none">Collaborators</div>
@@ -48,10 +60,11 @@
     <ToolbarCard cardType={CardType.Home} snapBottom>
         <ToolbarIcon on:click={() => toggleCard(CardType.Home)}><FaBars /></ToolbarIcon>
         <div class="space-y-3" slot="content">
-            <div class="text-white select-none">Untitled Sketch</div>
+            <div class="text-white select-none">Options</div>
             <div class="space-y-1">
                 <div on:click={() => toggleCardWithinCard(CardType.Collaborators)} class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Collaborators</div>
                 <div on:click={() => toggleCardWithinCard(CardType.Export)} class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Export</div>
+                <!-- <div on:click={onLeaveSketch} class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Leave Sketch</div> -->
                 <!-- <div class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Canvas</div>
                 <div class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Preferences</div>
                 <div class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Help</div> -->

@@ -35,7 +35,6 @@ export class App {
         this.artistManager = new ArtistManager()
         this.connection = new Connection()
 
-        
         this.artistManager.addListeners()
         this.connection.connect()
 
