@@ -14,11 +14,12 @@
     import { toggleCard } from "./Card/CardState";
     import { CardType } from "./Card/CardTypes";
     import ColorPicker from "./ColorPicker/ColorPicker.svelte";
-    import { brushColor, brushHardness, brushSize, brushSpacing } from "../stores/brushSettings";
+    import { brushColor, brushHardness, brushSize, brushSpacing, brushUseOpacityPressure, brushUseSizePressure } from "../stores/brushSettings";
     import convert from "svelte-awesome-color-picker/util/convert";
     import SizeSlider from "./Card/Slider.svelte";
     import TipList from "./Card/Brush/TipList.svelte";
-    import { eraserHardness, eraserSize, eraserSpacing } from "../stores/eraserSettings";
+    import { eraserHardness, eraserSize, eraserSpacing, eraserUseOpacityPressure, eraserUseSizePressure } from "../stores/eraserSettings";
+import Switch from "../Common/Switch.svelte";
 
     let selectedTool: ToolType = null;
     let colorBorderWidth: string = "0px";
@@ -76,6 +77,14 @@
                 <div class="text-gray-400">Hardness</div>
                 <SizeSlider bind:value={$brushHardness} min={1} max={20} />
             </div>
+            <div class="flex items-center justify-between">
+                <div class="text-gray-400">Control Size With Pressure</div>
+                <Switch bind:active={$brushUseSizePressure} />
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-gray-400">Control Opacity With Pressure</div>
+                <Switch bind:active={$brushUseOpacityPressure} />
+            </div>
             <!-- <div class="space-y-1">
                 <div class="text-gray-400">Spacing</div>
                 <SizeSlider bind:value={$brushSpacing} />
@@ -86,7 +95,7 @@
         <Tool on:click={() => handleToolClick(ToolType.Eraser, CardType.Eraser)} active={selectedTool === ToolType.Eraser}>
             <FaEraser />
         </Tool>
-        <div slot="content">
+        <div class="space-y-3" slot="content">
             <div class="text-white select-none">Eraser</div>
             <TipList />
             <div class="space-y-1">
@@ -96,6 +105,14 @@
             <div class="space-y-1">
                 <div class="text-gray-400">Hardness</div>
                 <SizeSlider bind:value={$eraserHardness} min={1} max={20} />
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-gray-400">Control Size With Pressure</div>
+                <Switch bind:active={$eraserUseSizePressure} />
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-gray-400">Control Opacity With Pressure</div>
+                <Switch bind:active={$eraserUseOpacityPressure} />
             </div>
             <!-- <div class="space-y-1">
                 <div class="text-gray-400">Spacing</div>

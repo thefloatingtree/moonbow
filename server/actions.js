@@ -114,7 +114,6 @@ export function connectToRoom(data, ws) {
     const isJoining = !!data.body?.roomId && rooms.get(data.body.roomId)
     const roomId = isJoining ? data.body.roomId : uuid()
 
-    const name = !!data.body?.name ? data.body.name : names[room.length]
     
     if (isJoining) {
         // Join pre existing room
@@ -128,6 +127,8 @@ export function connectToRoom(data, ws) {
     }
     
     const room = rooms.get(roomId)
+    
+    const name = !!data.body?.name ? data.body.name : names[room.length]
     
     ws.roomId = roomId
     ws.id = uuid()

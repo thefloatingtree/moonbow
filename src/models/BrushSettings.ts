@@ -5,4 +5,6 @@ export class BrushSettings {
     public spacing: number;
     public tipType: 'circle' | 'square';
     public hardness: number;
+    public useSizePressure: boolean;
+    public useOpacityPressure: boolean;
 }

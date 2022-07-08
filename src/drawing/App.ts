@@ -2,10 +2,10 @@ import * as PIXI from 'pixi.js'
 import { Canvas } from './Canvas/Canvas'
 import { Viewport } from './Viewport'
 import { RenderTexturePool } from './Util/RenderTexturePool'
-import { brushColor, brushHardness, brushOpacity, brushSettings, brushSize, brushSpacing, brushTipType } from '../lib/stores/brushSettings'
+import { brushColor, brushHardness, brushOpacity, brushSettings, brushSize, brushSpacing, brushTipType, brushUseOpacityPressure, brushUseSizePressure } from '../lib/stores/brushSettings'
 import { colorPickerStore } from '../lib/stores/colorPicker'
 import { BrushManager } from './Brush/BrushManager'
-import { eraserHardness, eraserOpacity, eraserSettings, eraserSize, eraserSpacing, eraserTipType } from '../lib/stores/eraserSettings'
+import { eraserHardness, eraserOpacity, eraserSettings, eraserSize, eraserSpacing, eraserTipType, eraserUseOpacityPressure, eraserUseSizePressure } from '../lib/stores/eraserSettings'
 import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
 
@@ -60,22 +60,26 @@ export class App {
     }
 
     private addUIIntegrations() {
-        colorPickerStore.set({ hex: app.canvas.brushSettings.color })
+        colorPickerStore.set({ hex: app.canvas.defaultBrushSettings.color })
 
-        brushColor.set(app.canvas.brushSettings.color)
-        brushOpacity.set(app.canvas.brushSettings.opacity)
-        brushSize.set(app.canvas.brushSettings.size)
-        brushHardness.set(app.canvas.brushSettings.hardness)
-        brushSpacing.set(app.canvas.brushSettings.spacing)
-        brushTipType.set(app.canvas.brushSettings.tipType)
+        brushColor.set(app.canvas.defaultBrushSettings.color)
+        brushOpacity.set(app.canvas.defaultBrushSettings.opacity)
+        brushSize.set(app.canvas.defaultBrushSettings.size)
+        brushHardness.set(app.canvas.defaultBrushSettings.hardness)
+        brushSpacing.set(app.canvas.defaultBrushSettings.spacing)
+        brushTipType.set(app.canvas.defaultBrushSettings.tipType)
+        brushUseSizePressure.set(app.canvas.defaultBrushSettings.useSizePressure)
+        brushUseOpacityPressure.set(app.canvas.defaultBrushSettings.useOpacityPressure)
 
         brushSettings.subscribe((brushSettings) => app.artistManager.localArtist.changeBrushSettings(brushSettings))
 
-        eraserOpacity.set(app.canvas.eraserSettings.opacity)
-        eraserSize.set(app.canvas.eraserSettings.size)
-        eraserHardness.set(app.canvas.eraserSettings.hardness)
-        eraserSpacing.set(app.canvas.eraserSettings.spacing)
-        eraserTipType.set(app.canvas.eraserSettings.tipType)
+        eraserOpacity.set(app.canvas.defaultEraserSettings.opacity)
+        eraserSize.set(app.canvas.defaultEraserSettings.size)
+        eraserHardness.set(app.canvas.defaultEraserSettings.hardness)
+        eraserSpacing.set(app.canvas.defaultEraserSettings.spacing)
+        eraserTipType.set(app.canvas.defaultEraserSettings.tipType)
+        eraserUseSizePressure.set(app.canvas.defaultEraserSettings.useSizePressure)
+        eraserUseOpacityPressure.set(app.canvas.defaultEraserSettings.useOpacityPressure)
 
         eraserSettings.subscribe((eraserSettings) => app.artistManager.localArtist.changeEraserSettings(eraserSettings))
     }

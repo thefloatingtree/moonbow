@@ -16,29 +16,30 @@ export class Canvas {
         backgroundColor: 0xFFFFFF,
     }
 
-    public brushSettings: BrushSettings = {
+    public defaultBrushSettings: BrushSettings = {
         color: "#03B3FF",
         opacity: 1,
         size: 10,
         spacing: 2,
         tipType: 'circle',
-        hardness: 2
+        hardness: 2,
+        useSizePressure: true,
+        useOpacityPressure: false,
     }
 
-    public eraserSettings: BrushSettings = {
+    public defaultEraserSettings: BrushSettings = {
         color: "#FFFFFF",
         opacity: 1,
         size: 10,
         spacing: 2,
         tipType: 'circle',
-        hardness: 2
+        hardness: 2,
+        useSizePressure: true,
+        useOpacityPressure: false,
     }
 
 
     private liveBrushStrokes: Map<string, { brushStroke: BrushStroke, pointerDown: Boolean }> = new Map()
-
-    private liveBrushStroke: BrushStroke
-    private pointerDown: boolean
 
     private activeLayer: Layer
 
@@ -85,6 +86,9 @@ export class Canvas {
     startBrushStroke(_: PointerEvent, artist: Artist, erase: boolean = false) {        
         const settings = erase ? artist.eraserSettings : artist.brushSettings
         const brush = app.brushManager.getBrush(settings)
+
+        console.log(settings)
+        console.log(brush)
         
         const brushStroke = new BrushStroke(brush)
         this.container.addChild(brushStroke.container)
@@ -99,9 +103,9 @@ export class Canvas {
         const { brushStroke, pointerDown } = this.liveBrushStrokes.get(artist.id)
 
         if (pointerDown) {
-            const { x, y } = e
+            const { x, y, pressure } = e
             const pointInCanvasSpace = app.viewport.convertScreenToCanvas(x, y)
-            brushStroke.addNode(pointInCanvasSpace.x, pointInCanvasSpace.y, e.pressure)
+            brushStroke.addNode(pointInCanvasSpace.x, pointInCanvasSpace.y, pressure)
         }
     }
 
@@ -112,8 +116,8 @@ export class Canvas {
         const { brushStroke, pointerDown } = this.liveBrushStrokes.get(artist.id)
 
         if (pointerDown) {
-            const { x, y } = e
-            brushStroke.addNode(x, y, e.pressure)
+            const { x, y, pressure } = e
+            brushStroke.addNode(x, y, pressure)
         }
     }
 

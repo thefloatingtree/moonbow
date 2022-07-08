@@ -56,20 +56,20 @@ export class LocalArtist extends Artist {
             })
         })
         this.eventSource.onMouseMove((e) => {
-            const { buttons, button, x, y, movementX, movementY } = e
+            const { buttons, button, x, y, movementX, movementY, pressure } = e
 
             const pointInCanvasSpace = app.viewport.convertScreenToCanvas(x, y)
 
             app.connection.sendMessage(MessageTypes.OnClientEvent, {
                 eventType: EventType.onMouseMove,
-                data: { buttons, button, x: pointInCanvasSpace.x, y: pointInCanvasSpace.y, movementX, movementY }
+                data: { buttons, button, x: pointInCanvasSpace.x, y: pointInCanvasSpace.y, movementX, movementY, pressure }
             })
         })
         this.eventSource.onMouseUp((e) => {
-            const { buttons, button, x, y } = e
+            const { buttons, button, x, y, pressure } = e
             app.connection.sendMessage(MessageTypes.OnClientEvent, {
                 eventType: EventType.onMouseUp,
-                data: { buttons, button, x, y }
+                data: { buttons, button, x, y, pressure }
             })
         })
         this.eventSource.onKeyboardDown((e) => {
