@@ -8,6 +8,7 @@ import { BrushManager } from './Brush/BrushManager'
 import { eraserHardness, eraserOpacity, eraserSettings, eraserSize, eraserSpacing, eraserTipType, eraserUseOpacityPressure, eraserUseSizePressure } from '../lib/stores/eraserSettings'
 import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
+import { DropShadowFilter } from 'pixi-filters';
 
 export class App {
     public ref: HTMLCanvasElement
@@ -39,7 +40,7 @@ export class App {
         this.connection.connect()
 
         this.addUIIntegrations()
-        
+
         this.application.stage.addChild(this.viewport.container)
         this.application.start()
 
@@ -54,7 +55,7 @@ export class App {
         PIXI.settings.FILTER_RESOLUTION = 1
         PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH
         PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.ON
-        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+        // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
         PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
         PIXI.utils.skipHello()
     }

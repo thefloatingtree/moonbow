@@ -1,14 +1,25 @@
 import { MessageTypes } from "../../../server/MessageTypes";
 import { brushColor } from "../../../src/lib/stores/brushSettings";
 import { app } from "../App";
+import { Cursor } from "../Cursor/Cursor";
 import { OnDownTriggerAction, OnUpTriggerAction, OnHoldReleaseTriggerAction } from "../Interactions/Actions/Actions";
 import { RemoteEventSource } from "../Interactions/Events/RemoteEventSource";
+import { EventType } from "../Interactions/Tools/Tool";
 import { ToolType } from "../Interactions/Tools/ToolTypes";
 import { Artist } from "./Artist";
 
 export class RemoteArtist extends Artist {
+
+    private cursor: Cursor
+
     constructor(id: string, name: string, owner: boolean, color: string) {
         super(id, name, owner, color, new RemoteEventSource(id))
+
+        this.cursor = new Cursor(name, color)
+
+        if (app.artistManager.localArtist.id && app.artistManager.localArtist.id !== this.id) {
+            app.application.stage.addChild(this.cursor.container)
+        }
 
         this.addActions()
         this.addTools()
@@ -17,28 +28,42 @@ export class RemoteArtist extends Artist {
     }
 
     destroy(): void {
+        app.application.stage.removeChild(this.cursor.container)
         this.eventSource.destroy()
         app.connection.removeMessageListener(this.handleToolChangeEvent.bind(this))
     }
 
     private handleToolChangeEvent(message: any) {
         const { type, body } = message
+        if (type === MessageTypes.OnClientEvent &&
+            this.id === body.client.id &&
+            this.id !== app.artistManager.localArtist.id
+        ) {
+            if (body.event.eventType === EventType.onMouseMove) {
+                const { x, y } = body.event.data
+
+                const converted = app.viewport.convertCanvasToScreen(x, y)
+
+                this.cursor.x = converted.x
+                this.cursor.y = converted.y
+            }
+        }
         if (type === MessageTypes.OnClientToolUpdate &&
             this.id === body.client.id &&
             this.id !== app.artistManager.localArtist.id
-            ) {
-                switch (body.event.eventType) {
-                    case 'TOOL_TYPE_CHANGE':
-                        this.toolManager.selectTool(body.event.data.toolType)
-                        break
-                    case 'BRUSH_SETTINGS_CHANGE':
-                        this.brushSettings = body.event.data.brushSettings
-                        break
-                    case 'ERASER_SETTINGS_CHANGE':
-                        this.eraserSettings = body.event.data.eraserSettings
-                        break
-                }
+        ) {
+            switch (body.event.eventType) {
+                case 'TOOL_TYPE_CHANGE':
+                    this.toolManager.selectTool(body.event.data.toolType)
+                    break
+                case 'BRUSH_SETTINGS_CHANGE':
+                    this.brushSettings = body.event.data.brushSettings
+                    break
+                case 'ERASER_SETTINGS_CHANGE':
+                    this.eraserSettings = body.event.data.eraserSettings
+                    break
             }
+        }
     }
 
     private setupRemote() {

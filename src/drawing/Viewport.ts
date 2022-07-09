@@ -34,6 +34,10 @@ export class Viewport {
         return this.container.worldTransform.applyInverse(new PIXI.Point(x, y))
     }
 
+    convertCanvasToScreen(x: number, y: number) {
+        return this.container.worldTransform.apply(new PIXI.Point(x, y))
+    }
+
     rotateBy(radians: number) {
         this.rotateTo(this.circularRotation + radians, this.container.rotation + radians)
     }

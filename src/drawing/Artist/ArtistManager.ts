@@ -7,7 +7,7 @@ import { RemoteArtist } from "./RemoteArtist";
 
 export class ArtistManager {
     public remoteArtists: Array<RemoteArtist> = []
-    public localArtist: LocalArtist = new LocalArtist("local", "No Name", false, "#FFFFFF")
+    public localArtist: LocalArtist = new LocalArtist(null, null, false, "#FFFFFF")
 
     constructor() {
         artists.subscribe(console.log)

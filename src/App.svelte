@@ -15,7 +15,7 @@
 
 
     onMount(() => {
-        $isHome = true
+        $isHome = false
     })
 
 </script>
