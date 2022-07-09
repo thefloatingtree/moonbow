@@ -84,9 +84,6 @@ export class Canvas {
     startBrushStroke(_: PointerEvent, artist: Artist, erase: boolean = false) {        
         const settings = erase ? artist.eraserSettings : artist.brushSettings
         const brush = app.brushManager.getBrush(settings)
-
-        console.log(settings)
-        console.log(brush)
         
         const brushStroke = new BrushStroke(brush)
         this.container.addChild(brushStroke.container)

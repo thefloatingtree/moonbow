@@ -21,7 +21,6 @@ export function toggleCardWithinCard(cardType: CardType) {
 
 export function ignoreNextClickOutside() {
     ignoreClickOutsideCount += 1
-    console.log(ignoreClickOutsideCount)
 }
 
 export function handleClickOutsideCard(cardType: CardType) {

@@ -9,9 +9,9 @@ export class ArtistManager {
     public remoteArtists: Array<RemoteArtist> = []
     public localArtist: LocalArtist = new LocalArtist(null, null, false, "#FFFFFF")
 
-    constructor() {
-        artists.subscribe(console.log)
-    }
+    // constructor() {
+    //     artists.subscribe(console.log)
+    // }
 
     public addListeners() {
         app.connection.addMessageListener((message) => {
