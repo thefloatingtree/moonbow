@@ -35,5 +35,6 @@
         background-color: #171717;
         height: 100vh;
         widows: 100vw;
+        overflow: hidden;
     }
 </style>
