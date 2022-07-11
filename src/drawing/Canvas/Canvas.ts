@@ -121,6 +121,8 @@ export class Canvas {
         const strokeSprite = renderAsSprite(stroke, strokeRenderTexture)
         this.container.addChild(strokeSprite)
         appendToArrayInMap(this.undoStack, artist.id, strokeSprite)
+
+        this.redoStack.get(artist.id)?.forEach(sprite => app.renderTexturePool.release(sprite.texture as PIXI.RenderTexture))
         this.redoStack.set(artist.id, [])
     }
 
