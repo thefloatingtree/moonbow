@@ -18,7 +18,10 @@
     import SizeSlider from "./Card/Slider.svelte";
     import ToolbarCard from "./Card/ToolbarCard.svelte";
     import ColorPicker from "./ColorPicker/ColorPicker.svelte";
+import ToolbarIcon from "./ToolbarIcon.svelte";
     import Tool from "./ToolbarIcon.svelte";
+    import FaUndo from 'svelte-icons/fa/FaUndo.svelte'
+    import FaRedo from 'svelte-icons/fa/FaRedo.svelte'
 
     let selectedTool: ToolType = null;
     let colorBorderWidth: string = "0px";
@@ -131,4 +134,10 @@
     <Tool on:click={() => handleToolClick(ToolType.Eyedropper)} active={selectedTool === ToolType.Eyedropper}>
         <FaEyeDropper />
     </Tool>
+    <ToolbarIcon on:click={() => app.artistManager.localArtist.undo()}>
+        <FaUndo />
+    </ToolbarIcon>
+    <ToolbarIcon on:click={() => app.artistManager.localArtist.redo()}>
+        <FaRedo />
+    </ToolbarIcon>
 </div>

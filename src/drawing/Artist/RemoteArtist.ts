@@ -62,6 +62,12 @@ export class RemoteArtist extends Artist {
                 case 'ERASER_SETTINGS_CHANGE':
                     this.eraserSettings = body.event.data.eraserSettings
                     break
+                case 'UNDO':
+                    app.canvas.undo(this)
+                    break
+                case 'REDO':
+                    app.canvas.redo(this)
+                    break
             }
         }
     }
@@ -91,6 +97,10 @@ export class RemoteArtist extends Artist {
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
         this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.Eyedropper)))
         this.actionManager.addAction(new OnUpTriggerAction(['alt'], () => this.toolManager.selectPreviousTool()))
+        // undo/redo
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => app.canvas.undo(this)))
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => app.canvas.redo(this)))
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => app.canvas.redo(this)))
     }
 
     private addTools() {

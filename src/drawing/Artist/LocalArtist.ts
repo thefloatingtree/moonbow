@@ -27,8 +27,26 @@ export class LocalArtist extends Artist {
         })
     }
 
+    public undo(broadcast = true) {
+        app.canvas.undo(this)
+        if (!broadcast) return
+        app.connection.sendMessage(MessageTypes.OnClientToolUpdate, {
+            eventType: 'UNDO',
+            data: {}
+        })
+    }
+
+    public redo(broadcast = true) {
+        app.canvas.redo(this)
+        if (!broadcast) return
+        app.connection.sendMessage(MessageTypes.OnClientToolUpdate, {
+            eventType: 'REDO',
+            data: {}
+        })
+    }
+
     public changeBrushSettings(updatedBrushSettings: BrushSettings) {
-        
+
         this.brushSettings = updatedBrushSettings
 
         app.connection.sendMessage(MessageTypes.OnClientToolUpdate, {
@@ -38,7 +56,7 @@ export class LocalArtist extends Artist {
     }
 
     public changeEraserSettings(updatedEraserSettings: BrushSettings) {
-        
+
         this.eraserSettings = updatedEraserSettings
 
         app.connection.sendMessage(MessageTypes.OnClientToolUpdate, {
@@ -95,7 +113,6 @@ export class LocalArtist extends Artist {
         this.actionManager.addAction(new OnUpTriggerAction([' '], () => this.toolManager.selectPreviousTool()))
         this.actionManager.addAction(new OnDownTriggerAction(['mousemiddle'], () => this.toolManager.selectTool(ToolType.Pan)))
         this.actionManager.addAction(new OnUpTriggerAction(['mousemiddle'], () => this.toolManager.selectPreviousTool()))
-
         // zoom
         this.actionManager.addAction(new OnDownTriggerAction(['z'], () => this.toolManager.selectTool(ToolType.Zoom)))
         this.actionManager.addAction(new OnHoldReleaseTriggerAction(['z'], () => this.toolManager.selectPreviousTool()))
@@ -109,6 +126,10 @@ export class LocalArtist extends Artist {
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
         this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.Eyedropper)))
         this.actionManager.addAction(new OnUpTriggerAction(['alt'], () => this.toolManager.selectPreviousTool()))
+        // undo/redo
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.undo(false)))
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.redo(false)))
+        this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.redo(false)))
     }
 
     destroy(): void {

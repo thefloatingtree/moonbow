@@ -55,7 +55,7 @@ export class App {
         PIXI.settings.FILTER_RESOLUTION = 1
         PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH
         PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.ON
-        // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
         PIXI.settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT
         PIXI.utils.skipHello()
     }
