@@ -1,12 +1,21 @@
 export class Action {
-    constructor(protected shortcut: Array<string>, protected action: Function) {}
+    constructor(protected shortcut: Array<string>, protected action: Function) { }
 
     protected allPressed(keyboard: Object) {
-        return this.shortcut.reduce((acc, key) => acc && keyboard[key], true)
+        return this.shortcut.reduce((acc, key) => acc && keyboard[key], true) && this.noOtherKeysPressed(keyboard)
     }
 
-    public onDown(keyboard: Object): void {}
-    public onUp(keyboard: Object): void {}
+    private noOtherKeysPressed(keyboard: Object) {
+        let otherKeyPressed = false
+        for (const key in keyboard) {
+            if (this.shortcut.includes(key)) continue
+            otherKeyPressed = otherKeyPressed || keyboard[key]
+        }
+        return !otherKeyPressed
+    }
+
+    public onDown(keyboard: Object): void { }
+    public onUp(keyboard: Object): void { }
 }
 
 export class OnDownTriggerAction extends Action {
@@ -31,12 +40,12 @@ export class OnUpTriggerAction extends Action {
         if (this.wasPressed && !this.allPressed(keyboard)) {
             this.wasPressed = false
             this.action()
-        } 
+        }
     }
 }
 
 export class OnHoldReleaseTriggerAction extends Action {
-    
+
     private timer: NodeJS.Timeout
     private shouldRunAction: boolean = false
     private held: boolean = false
@@ -59,7 +68,7 @@ export class OnHoldReleaseTriggerAction extends Action {
             if (this.shouldRunAction) {
                 this.action()
             }
-            
+
             this.held = false
             this.shouldRunAction = false
             clearTimeout(this.timer)
