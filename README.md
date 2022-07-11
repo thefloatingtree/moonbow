@@ -6,7 +6,7 @@
 
 ## Description
 
-My senior project at BYU-Idaho for my bachelors degree. 
+My senior project at BYU-Idaho for my bachelors degree. This project allows for multiple artists to collaborate on the same canvas. It implements most basic tools that digital artists require to sketch and paint. 
 
 ## Dev
 
