@@ -12,7 +12,7 @@ const serveStatic = serveDir(publicPath)
 export const app = App()
     .ws('/*', {
         message: onClientMessage,
-        close: onClientDisconnect
+        close: onClientDisconnect,
     })
     .get("/*", serveStatic)
     .listen('0.0.0.0', PORT, (listenSocket) => {

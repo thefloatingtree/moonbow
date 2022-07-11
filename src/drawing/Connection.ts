@@ -32,6 +32,7 @@ export class Connection {
                 if (message.type === MessageTypes.OnSelfConnected) {
                     this.joinURL = `${window.location.origin}/?room=${message.body.roomId}`
                     window.history.pushState("", "", `/?room=${message.body.roomId}`)
+                    this.startPingLoop()
                 }
 
                 this.listeners.forEach(listener => listener(message))
@@ -42,14 +43,21 @@ export class Connection {
         }
     }
 
+    
     public disconnect() {
         this.ws.close()
         this.ws = null
     }
-
+    
     public sendMessage(type: MessageType, message: Object) {
         if (this.ws.readyState === this.ws.OPEN)
-            this.ws.send(JSON.stringify({ type, body: message }))
+        this.ws.send(JSON.stringify({ type, body: message }))
+    }
+
+    private startPingLoop() {
+        setInterval(() => {
+            this.sendMessage(MessageTypes.Ping, {})
+        }, 1000 * 100) // Default uWebsockets.js socket timeout is 120 seconds
     }
 
     private getRoomCode() {

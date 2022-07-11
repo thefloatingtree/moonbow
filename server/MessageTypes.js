@@ -7,4 +7,5 @@ export const MessageTypes = Object.freeze({
     JoinRoom: "JOIN_ROOM",
     OnClientToolUpdate: "ON_CLIENT_TOOL_UPDATE",
     OnClientEvent: "ON_CLIENT_EVENT",
+    Ping: "PING"
 });

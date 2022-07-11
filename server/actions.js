@@ -17,6 +17,9 @@ export function onClientMessage(ws, message) {
         case MessageTypes.GetCurrentState:
             sendCurrentState(ws)
             break
+        case MessageTypes.Ping:
+            console.log("ping from " + ws.id)
+            break
         default:
             rebroadcast(data, ws)
     }
