@@ -12,15 +12,15 @@ export class Cursor {
     
     public set x(value: number) {
         this.container.x = value
-        this.startTimeout()
+        if (!this.localCursor) this.startTimeout()
     }
     
     public set y(value: number) {
         this.container.y = value
-        this.startTimeout()
+        if (!this.localCursor) this.startTimeout()
     }
 
-    constructor(public name: string, public color: string) {
+    constructor(public name: string, public color: string, public localCursor: boolean = false) {
         this.container = new PIXI.Container()
 
         const cursorTag = new PIXI.Container()
@@ -39,6 +39,9 @@ export class Cursor {
             
         const iconSize = 6
         const cursorIcon = new PIXI.Graphics()
+            .beginFill(0xFFFFFF)
+            .drawCircle(0, 0, iconSize * 1.2)
+            .endFill()
             .beginFill(PIXI.utils.string2hex(this.color))
             .drawCircle(0, 0, iconSize)
             .endFill()
@@ -52,9 +55,9 @@ export class Cursor {
         cursorTag.y = -cursorTag.height / 2
         cursorTag.x = cursorIcon.width / 2 + 5
 
-        this.container.addChild(cursorTag)
+        if (!this.localCursor) this.container.addChild(cursorTag)
         this.container.addChild(cursorIcon)
-        this.container.alpha = 0
+        if (!this.localCursor) this.container.alpha = 0
     }
 
     private startTimeout() {

@@ -32,6 +32,7 @@ export class App {
         this.renderTexturePool = new RenderTexturePool()
         this.canvas = new Canvas()
         this.viewport = new Viewport(this.canvas)
+        this.application.stage.addChild(this.viewport.container)
         this.brushManager = new BrushManager()
         this.artistManager = new ArtistManager()
         this.connection = new Connection()
@@ -41,8 +42,10 @@ export class App {
 
         this.addUIIntegrations()
 
-        this.application.stage.addChild(this.viewport.container)
         this.application.start()
+
+        this.application.renderer.plugins.interaction.cursorStyles.default = 'none'
+        this.application.renderer.plugins.interaction.setCursorMode('none')
 
         this.afterInitCallbacks.forEach(fn => fn())
     }

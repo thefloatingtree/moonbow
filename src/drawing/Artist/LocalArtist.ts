@@ -7,11 +7,30 @@ import { LocalEventSource } from "../Interactions/Events/LocalEventSource";
 import { MessageTypes } from "../../../server/MessageTypes";
 import { EventType } from "../Interactions/Tools/Tool";
 import type { BrushSettings } from "src/models/BrushSettings";
+import { Cursor } from "../Cursor/Cursor";
 
 export class LocalArtist extends Artist {
 
+    private cursor: Cursor
+
     constructor(id: string, name: string, owner: boolean, color: string) {
         super(id, name, owner, color, new LocalEventSource())
+
+        this.cursor = new Cursor("local", "#171717", true)
+        app.application.stage.addChild(this.cursor.container)
+
+        console.log(app.application.stage.children)
+
+        app.ref.addEventListener('mouseenter', () => {
+            this.cursor.container.alpha = 1
+        })
+        app.ref.addEventListener('mouseleave', () => {
+            this.cursor.container.alpha = 0
+        })
+        app.ref.addEventListener('mousemove', (e) => {
+            this.cursor.x = e.x
+            this.cursor.y = e.y
+        })
 
         this.addActions()
         this.addTools()
