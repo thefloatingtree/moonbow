@@ -10,6 +10,7 @@ import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
 import { DropShadowFilter } from 'pixi-filters';
 import { Grid } from './Grid'
+import { Animator } from './Animator'
 
 export class App {
     public ref: HTMLCanvasElement
@@ -21,6 +22,7 @@ export class App {
     public brushManager: BrushManager
     public connection: Connection
     public artistManager: ArtistManager
+    public animator: Animator
 
     private afterInitCallbacks: Array<Function> = []
 
@@ -42,13 +44,16 @@ export class App {
         this.brushManager = new BrushManager()
         this.artistManager = new ArtistManager()
         this.connection = new Connection()
+        this.animator = new Animator()
 
         this.artistManager.addListeners()
         this.connection.connect()
 
+
         this.addUIIntegrations()
 
         this.application.start()
+        this.application.ticker.add(this.animator.tick.bind(this.animator))
 
         this.application.renderer.plugins.interaction.cursorStyles.default = 'none'
         this.application.renderer.plugins.interaction.setCursorMode('none')

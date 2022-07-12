@@ -10,8 +10,8 @@ export class Connection {
     public ws: WebSocket = null
     public joinURL = ""
 
-    // public websocketURL = 'ws://localhost:5000'
-    public websocketURL = window.location.href.replace(window.location.protocol, 'ws:')
+    public websocketURL = 'ws://localhost:5000'
+    // public websocketURL = window.location.href.replace(window.location.protocol, 'ws:')
     
     private listeners: Array<Listener> = []
 

@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import { app } from '../App'
 import { Easing } from '../util'
 
 export class Cursor {
@@ -6,8 +7,7 @@ export class Cursor {
     private timeout: NodeJS.Timeout
 
     private fadeDelay = 3000
-    private fadeFrameCount = 30
-    private fadeFrame = 0
+    private animationId: number
 
     
     public set x(value: number) {
@@ -61,17 +61,11 @@ export class Cursor {
     }
 
     private startTimeout() {
+        app.animator.cancelAnimation(this.animationId)
         this.container.alpha = 1
         clearTimeout(this.timeout)
         this.timeout = setTimeout(() => {
-            this.fadeFrame = 0
-            this.fade()
+            this.animationId = app.animator.animate(value => this.container.alpha = value, 1, 0, 150)
         }, this.fadeDelay)
-    }
-
-    private fade() {
-        this.container.alpha = Easing.easeInOutQuad(1 - (this.fadeFrame / this.fadeFrameCount))
-        this.fadeFrame += 1
-        if (this.fadeFrame <= this.fadeFrameCount) requestAnimationFrame(this.fade.bind(this))
     }
 }
