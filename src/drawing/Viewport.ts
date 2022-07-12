@@ -77,6 +77,20 @@ export class Viewport {
     }
 
     scrubbyRotateEnd(e: MouseEvent) {
+
+        const near = (value, target, tolerance) => {
+            const min = target - tolerance
+            const max = target + tolerance
+            return value >= min && value <= max
+        }
+
+        if (near(this.container.angle % 90, 0, 5) || near(this.container.angle % 90, 90, 5)) {
+            app.animator.animate(value => {
+                this.container.angle = value
+                this.updateMask()
+            }, this.container.angle, Math.round(this.container.angle / 90) * 90, 200)
+        }
+
         this.scrubbyRotateInitialPoint = null
         this.scrubbyRotateInitialRotation = null
         this.scrubbyRotateInitialCircularRotation = null
