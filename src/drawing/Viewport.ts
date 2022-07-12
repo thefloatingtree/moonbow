@@ -84,7 +84,7 @@ export class Viewport {
             return value >= min && value <= max
         }
 
-        if (near(this.container.angle % 90, 0, 5) || near(this.container.angle % 90, 90, 5)) {
+        if (near(Math.abs(this.container.angle % 90), 0, 5) || near(Math.abs(this.container.angle % 90), 90, 5)) {
             app.animator.animate(value => {
                 this.container.angle = value
                 this.updateMask()
