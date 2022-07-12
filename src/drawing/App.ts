@@ -9,12 +9,14 @@ import { eraserHardness, eraserOpacity, eraserSettings, eraserSize, eraserSpacin
 import { Connection } from './Connection'
 import { ArtistManager } from './Artist/ArtistManager'
 import { DropShadowFilter } from 'pixi-filters';
+import { Grid } from './Grid'
 
 export class App {
     public ref: HTMLCanvasElement
     public application: PIXI.Application
     public canvas: Canvas
     public viewport: Viewport
+    public grid: Grid
     public renderTexturePool: RenderTexturePool
     public brushManager: BrushManager
     public connection: Connection
@@ -27,12 +29,16 @@ export class App {
 
         this.configurePIXI()
 
-        this.application = new PIXI.Application({ view: this.ref, backgroundColor: 0x3E3E46, resizeTo: window, antialias: true })
+        this.application = new PIXI.Application({ view: this.ref, backgroundColor: 0x252525, resizeTo: window, antialias: true })
 
         this.renderTexturePool = new RenderTexturePool()
         this.canvas = new Canvas()
         this.viewport = new Viewport(this.canvas)
+        this.grid = new Grid()
+
+        this.application.stage.addChild(this.grid.container)
         this.application.stage.addChild(this.viewport.container)
+
         this.brushManager = new BrushManager()
         this.artistManager = new ArtistManager()
         this.connection = new Connection()
