@@ -7,13 +7,16 @@ import { renderAsSprite } from '../util'
 
 
 export class Canvas {
+
     public container: PIXI.Container = new PIXI.Container()
+    
     public settings = {
         width: 1000,
         height: 1000,
         backgroundColor: 0xFFFFFF,
+        historyStates: 25
     }
-
+    
     public defaultBrushSettings: BrushSettings = {
         color: "#03B3FF",
         opacity: 1,
@@ -24,7 +27,7 @@ export class Canvas {
         useSizePressure: true,
         useOpacityPressure: false,
     }
-
+    
     public defaultEraserSettings: BrushSettings = {
         color: "#FFFFFF",
         opacity: 1,
@@ -35,9 +38,10 @@ export class Canvas {
         useSizePressure: true,
         useOpacityPressure: false,
     }
-
-
+    
+    
     private liveBrushStrokes: Map<string, { brushStroke: BrushStroke, pointerDown: Boolean }> = new Map()
+    private flattenedCanvas: PIXI.Sprite = new PIXI.Sprite()
 
     private undoStack: Map<string, Array<PIXI.Sprite>> = new Map()
     private redoStack: Map<string, Array<PIXI.Sprite>> = new Map()
@@ -48,6 +52,7 @@ export class Canvas {
             .drawRect(0, 0, this.settings.width, this.settings.height)
             .endFill()
         this.container.addChild(background)
+        this.container.addChild(this.flattenedCanvas)
     }
 
     undo(artist: Artist) {
@@ -57,8 +62,6 @@ export class Canvas {
         appendToArrayInMap(this.redoStack, artist.id, undoneStrokeSprite)
 
         this.container.removeChild(undoneStrokeSprite)
-
-        // console.log({ u: this.undoStack, r: this.redoStack })
     }
 
     redo(artist: Artist) {
@@ -68,8 +71,6 @@ export class Canvas {
         appendToArrayInMap(this.undoStack, artist.id, redoneStrokeSprite)
 
         this.container.addChild(redoneStrokeSprite)
-
-        // console.log({ u: this.undoStack, r: this.redoStack })
     }
 
     startBrushStroke(_: PointerEvent, artist: Artist, erase: boolean = false) {        
@@ -122,8 +123,40 @@ export class Canvas {
         this.container.addChild(strokeSprite)
         appendToArrayInMap(this.undoStack, artist.id, strokeSprite)
 
+        if (this.undoStack.get(artist.id).length > this.settings.historyStates) {
+            const strokeToBeFlattened = this.undoStack.get(artist.id).shift()
+            this.flatten(strokeToBeFlattened)
+        }
+
         this.redoStack.get(artist.id)?.forEach(sprite => app.renderTexturePool.release(sprite.texture as PIXI.RenderTexture))
         this.redoStack.set(artist.id, [])
+    }
+
+    private flatten(stroke: PIXI.Sprite) {
+        const renderTexture = app.renderTexturePool.acquire(this.settings.width, this.settings.height)
+
+        const tempContainer = new PIXI.Container()
+        tempContainer.addChild(this.flattenedCanvas)    // Adding these to the temp container removes them from
+        tempContainer.addChild(stroke)                  // the main container
+        const tempFlattenedCanvas = renderAsSprite(tempContainer, renderTexture)
+
+        app.renderTexturePool.release(this.flattenedCanvas.texture as PIXI.RenderTexture)
+        this.flattenedCanvas = tempFlattenedCanvas
+
+        this.container.addChildAt(this.flattenedCanvas, 1)
+
+        app.renderTexturePool.release(stroke.texture as PIXI.RenderTexture)
+    }
+
+    flattenHistory() {
+        this.undoStack.forEach((strokes, artistId) => {
+            strokes.reverse().forEach(stroke => {
+                this.flatten(stroke)
+            })
+            this.redoStack.get(artistId)?.forEach(sprite => app.renderTexturePool.release(sprite.texture as PIXI.RenderTexture))
+            this.redoStack.set(artistId, [])
+            this.undoStack.set(artistId, [])
+        })
     }
 
     exportToPNG() {

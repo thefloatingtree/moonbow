@@ -19,8 +19,6 @@ export class LocalArtist extends Artist {
         this.cursor = new Cursor("local", "#171717", true)
         app.application.stage.addChild(this.cursor.container)
 
-        console.log(app.application.stage.children)
-
         app.ref.addEventListener('mouseenter', () => {
             this.cursor.container.alpha = 1
         })

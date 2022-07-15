@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { app } from './App'
 
 export class Grid {
     public container: PIXI.Container = new PIXI.Container()
@@ -8,7 +7,6 @@ export class Grid {
         this.constructLines()
 
         window.addEventListener('resize', (e) => {
-            console.log(e)
             this.constructLines()
         })
     }
