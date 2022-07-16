@@ -76,8 +76,8 @@ import ToolbarIcon from "./ToolbarIcon.svelte";
                 <SizeSlider bind:value={$brushSize} min={1} max={100} />
             </div>
             <div class="space-y-1">
-                <div class="text-gray-400">Hardness</div>
-                <SizeSlider bind:value={$brushHardness} min={1} max={20} />
+                <div class="text-gray-400">Softness</div>
+                <SizeSlider bind:value={$brushHardness} min={2} max={20} />
             </div>
             <div class="flex items-center justify-between">
                 <div class="text-gray-400">Control Size With Pressure</div>
@@ -105,8 +105,8 @@ import ToolbarIcon from "./ToolbarIcon.svelte";
                 <SizeSlider bind:value={$eraserSize} min={1} max={100} />
             </div>
             <div class="space-y-1">
-                <div class="text-gray-400">Hardness</div>
-                <SizeSlider bind:value={$eraserHardness} min={1} max={20} />
+                <div class="text-gray-400">Softness</div>
+                <SizeSlider bind:value={$eraserHardness} min={2} max={20} />
             </div>
             <div class="flex items-center justify-between">
                 <div class="text-gray-400">Control Size With Pressure</div>
