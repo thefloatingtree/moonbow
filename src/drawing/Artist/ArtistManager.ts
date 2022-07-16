@@ -13,6 +13,17 @@ export class ArtistManager {
     //     artists.subscribe(console.log)
     // }
 
+    public serialize() {
+        return this.remoteArtists.map(artist => {
+            const { id, brushSettings, eraserSettings, toolManager } = artist
+            return { id, brushSettings, eraserSettings, tool: toolManager.selectedTool() }
+        })
+    }
+
+    public deserialize(data: Array<any>) {
+
+    }
+
     public addListeners() {
         app.connection.addMessageListener((message) => {
             if (message.type === MessageTypes.OnClientConnected) {

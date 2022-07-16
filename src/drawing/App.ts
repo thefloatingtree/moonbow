@@ -49,7 +49,6 @@ export class App {
         this.artistManager.addListeners()
         this.connection.connect()
 
-
         this.addUIIntegrations()
 
         this.application.start()
@@ -63,6 +62,18 @@ export class App {
 
     onAfterInit(fn: Function) {
         this.afterInitCallbacks.push(fn)
+    }
+
+    serialize() {
+        return {
+            canvas: this.canvas.serialize(),
+            artists: this.artistManager.serialize()
+        }
+    }
+
+    deserialize(data: { canvas: any, artists: any }) {
+        this.canvas.deserialize(data.canvas)
+        this.artistManager.deserialize(data.artists)
     }
 
     private configurePIXI() {

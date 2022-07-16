@@ -145,15 +145,19 @@ export class Viewport {
         this.updateMask()
     }
 
-    colorAt(e: PointerEvent) {
+    colorAt(e: PointerEvent): string {
         const renderTexture = app.renderTexturePool.acquire(app.application.screen.width, app.application.screen.height)
+
+        app.application.stage.getChildByName('localcursor').visible = false
         app.application.renderer.render(app.application.stage, { renderTexture })
-        app.renderTexturePool.release(renderTexture)
-        
+        app.application.stage.getChildByName('localcursor').visible = true
+
         const canvas = app.application.renderer.plugins.extract.canvas(renderTexture)
         const canvasContext = canvas.getContext("2d")
         const [ r, g, b, _ ] = canvasContext.getImageData(e.x, e.y, 1, 1).data
-        
+
+        app.renderTexturePool.release(renderTexture)
+
         return rgb2hex({ r, g, b })
     }
 

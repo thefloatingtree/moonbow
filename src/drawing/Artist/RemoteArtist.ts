@@ -95,7 +95,7 @@ export class RemoteArtist extends Artist {
         // tools
         this.actionManager.addAction(new OnUpTriggerAction(['b'], () => this.toolManager.selectTool(ToolType.Brush)))
         this.actionManager.addAction(new OnUpTriggerAction(['e'], () => this.toolManager.selectTool(ToolType.Eraser)))
-        this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.Eyedropper)))
+        this.actionManager.addAction(new OnDownTriggerAction(['alt'], () => this.toolManager.selectTool(ToolType.None)))
         this.actionManager.addAction(new OnUpTriggerAction(['alt'], () => this.toolManager.selectPreviousTool()))
         // undo/redo
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => app.canvas.undo(this)))
@@ -131,11 +131,11 @@ export class RemoteArtist extends Artist {
             })
 
         // other tools
-        this.toolManager.addTool(ToolType.Eyedropper)
-            .onMouseUp(e => {
-                const hex = app.viewport.colorAt(e)
-                brushColor.set(hex)
-            })
+        // this.toolManager.addTool(ToolType.Eyedropper)
+        //     .onMouseUp(e => {
+        //         const hex = app.viewport.colorAt(e)
+        //         brushColor.set(hex)
+        //     })
 
         this.toolManager.selectTool(ToolType.Brush)
     }

@@ -23,6 +23,8 @@ export class Cursor {
     constructor(public name: string, public color: string, public localCursor: boolean = false) {
         this.container = new PIXI.Container()
 
+        this.container.name = name
+
         const cursorTag = new PIXI.Container()
 
         const cursorPaddingX = 10

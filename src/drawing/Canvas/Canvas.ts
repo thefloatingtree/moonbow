@@ -55,6 +55,16 @@ export class Canvas {
         this.container.addChild(this.flattenedCanvas)
     }
 
+    serialize() {
+        this.flattenHistory()
+        const base64FlattenedCanvas = app.application.renderer.plugins.extract.base64(this.flattenedCanvas)
+        return { base64FlattenedCanvas }
+    }
+
+    deserialize(data: { base64FlattenedCanvas: string }) {
+        
+    }
+
     undo(artist: Artist) {
         if (!this.undoStack.get(artist.id).length) return
 
@@ -115,6 +125,8 @@ export class Canvas {
         this.container.removeChild(brushStroke.container)
 
         this.liveBrushStrokes.set(artist.id, { brushStroke, pointerDown: false })
+
+        this.serialize()
     }
 
     private finishBrushStroke(stroke: PIXI.Container, artist: Artist) {

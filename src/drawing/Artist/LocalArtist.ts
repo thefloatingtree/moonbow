@@ -8,6 +8,7 @@ import { MessageTypes } from "../../../server/MessageTypes";
 import { EventType } from "../Interactions/Tools/Tool";
 import type { BrushSettings } from "src/models/BrushSettings";
 import { Cursor } from "../Cursor/Cursor";
+import { artists } from "../../lib/stores/artists";
 
 export class LocalArtist extends Artist {
 
@@ -16,7 +17,7 @@ export class LocalArtist extends Artist {
     constructor(id: string, name: string, owner: boolean, color: string) {
         super(id, name, owner, color, new LocalEventSource())
 
-        this.cursor = new Cursor("local", "#171717", true)
+        this.cursor = new Cursor("localcursor", "#171717", true)
         app.application.stage.addChild(this.cursor.container)
 
         app.ref.addEventListener('mouseenter', () => {
@@ -66,6 +67,16 @@ export class LocalArtist extends Artist {
 
         this.brushSettings = updatedBrushSettings
 
+        brushColor.set(this.brushSettings.color)
+
+        app.artistManager.remoteArtists = app.artistManager.remoteArtists.map(artist => {
+            if (artist.id === this.id) {
+                artist.brushSettings = updatedBrushSettings
+            }
+            return artist
+        })
+        artists.set(app.artistManager.remoteArtists)
+
         app.connection.sendMessage(MessageTypes.OnClientToolUpdate, {
             eventType: 'BRUSH_SETTINGS_CHANGE',
             data: { brushSettings: this.brushSettings }
@@ -75,6 +86,14 @@ export class LocalArtist extends Artist {
     public changeEraserSettings(updatedEraserSettings: BrushSettings) {
 
         this.eraserSettings = updatedEraserSettings
+
+        app.artistManager.remoteArtists = app.artistManager.remoteArtists.map(artist => {
+            if (artist.id === this.id) {
+                artist.eraserSettings = updatedEraserSettings
+            }
+            return artist
+        })
+        artists.set(app.artistManager.remoteArtists)
 
         app.connection.sendMessage(MessageTypes.OnClientToolUpdate, {
             eventType: 'ERASER_SETTINGS_CHANGE',
@@ -221,7 +240,8 @@ export class LocalArtist extends Artist {
         this.toolManager.addTool(ToolType.Eyedropper)
             .onMouseUp(e => {
                 const hex = app.viewport.colorAt(e)
-                brushColor.set(hex)
+                this.changeBrushSettings({ ...this.brushSettings, color: hex })
+                console.log(hex, this.brushSettings)
             })
 
         this.toolManager.selectTool(ToolType.Brush)
