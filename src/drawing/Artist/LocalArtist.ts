@@ -166,6 +166,13 @@ export class LocalArtist extends Artist {
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'z'], () => this.undo(false)))
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'shift', 'z'], () => this.redo(false)))
         this.actionManager.addAction(new OnUpTriggerAction(['control', 'y'], () => this.redo(false)))
+        // test
+
+        this.actionManager.addAction(new OnUpTriggerAction(['p'], () => {
+            const data = app.serialize()
+            console.log(data)
+            app.deserialize(data)
+        }))
     }
 
     destroy(): void {

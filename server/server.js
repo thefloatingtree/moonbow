@@ -11,6 +11,7 @@ const serveStatic = serveDir(publicPath)
 
 export const app = App()
     .ws('/*', {
+        maxPayloadLength: 16 * 1024 * 1024,
         message: onClientMessage,
         close: onClientDisconnect,
     })

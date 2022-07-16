@@ -44,7 +44,7 @@
             {/if}
         </div>
         <div class="space-y-3" slot="content">
-            <div class="text-white select-none">Collaborators</div>
+            <div class="text-white select-none font-semibold">Collaborators</div>
             {#each $artists as artist}
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -60,7 +60,7 @@
     <ToolbarCard cardType={CardType.Home} snapBottom>
         <ToolbarIcon on:click={() => toggleCard(CardType.Home)}><FaBars /></ToolbarIcon>
         <div class="space-y-3" slot="content">
-            <div class="text-white select-none">Options</div>
+            <div class="text-white select-none font-semibold">Options</div>
             <div class="space-y-1">
                 <div on:click={() => toggleCardWithinCard(CardType.Collaborators)} class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Collaborators</div>
                 <div on:click={() => toggleCardWithinCard(CardType.Export)} class="bg-[#2E2E2E] rounded-md py-2 px-3 text-gray-300 cursor-pointer hover:bg-[#4e4e4e] transition-all">Export</div>
@@ -74,7 +74,7 @@
     <ToolbarCard cardType={CardType.Export} snapBottom>
         <div class="space-y-3" slot="content">
             <div class="flex justify-between">
-                <div class="text-white select-none">Export</div>
+                <div class="text-white select-none font-semibold">Export</div>
                 <div on:click={() => toggleCardWithinCard(CardType.Home)} class="w-6 h-6 text-gray-500 hover:text-gray-400 cursor-pointer transition-all duration-75">
                     <FaArrowLeft />
                 </div>

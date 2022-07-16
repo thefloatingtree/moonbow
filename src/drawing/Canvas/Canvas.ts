@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import { MessageTypes } from '../../../server/MessageTypes'
 import type { BrushSettings } from 'src/models/BrushSettings'
 import { app } from '../App'
 import type { Artist } from '../Artist/Artist'
@@ -55,6 +56,14 @@ export class Canvas {
         this.container.addChild(this.flattenedCanvas)
     }
 
+    addListeners() {
+        app.connection.addMessageListener((message) => {
+            if (message.type === MessageTypes.OnClientConnected) {
+                app.canvas.flattenHistory()
+            }
+        })
+    }
+
     serialize() {
         this.flattenHistory()
         const base64FlattenedCanvas = app.application.renderer.plugins.extract.base64(this.flattenedCanvas)
@@ -62,7 +71,10 @@ export class Canvas {
     }
 
     deserialize(data: { base64FlattenedCanvas: string }) {
-        
+        const canvas = PIXI.Sprite.from(data.base64FlattenedCanvas)
+
+        this.container.removeChildAt(1)
+        this.container.addChildAt(canvas, 1)
     }
 
     undo(artist: Artist) {
@@ -125,8 +137,6 @@ export class Canvas {
         this.container.removeChild(brushStroke.container)
 
         this.liveBrushStrokes.set(artist.id, { brushStroke, pointerDown: false })
-
-        this.serialize()
     }
 
     private finishBrushStroke(stroke: PIXI.Container, artist: Artist) {

@@ -1,6 +1,7 @@
 import { MessageTypes } from "../../../server/MessageTypes";
 import { artists } from "../../lib/stores/artists";
 import { app } from "../App";
+import type { ToolType } from "../Interactions/Tools/ToolTypes";
 import type { Artist } from "./Artist";
 import { LocalArtist } from "./LocalArtist";
 import { RemoteArtist } from "./RemoteArtist";
@@ -20,8 +21,15 @@ export class ArtistManager {
         })
     }
 
-    public deserialize(data: Array<any>) {
-
+    public deserialize(data: Array<{id: string, brushSettings: any, eraserSettings: any, tool: ToolType}>) {
+        data.forEach(artistData => {
+            const artist = this.remoteArtists.find(remoteArtist => remoteArtist.id === artistData.id)
+            if (!artist) return
+            artist.brushSettings = artistData.brushSettings
+            artist.eraserSettings = artistData.eraserSettings
+            artist.toolManager.selectTool(artistData.tool)
+        })
+        artists.set(this.remoteArtists)
     }
 
     public addListeners() {
@@ -39,6 +47,7 @@ export class ArtistManager {
         app.connection.addMessageListener((message) => {
             if (message.type === MessageTypes.GetCurrentState) {
                 this.addRemoteArtists(message.body.clients.map(artistData => new RemoteArtist(artistData.id, artistData.name, artistData.owner, artistData.color)))
+                if (message.body.data) app.deserialize(message.body.data)
             }
         })
         app.connection.addMessageListener((message) => {

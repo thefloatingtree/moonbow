@@ -59,7 +59,7 @@ import ToolbarIcon from "./ToolbarIcon.svelte";
             <div style:background-color={$brushColor} style:outline-width={colorBorderWidth} class="rounded-full w-7 h-7 outline outline-white outline-4" />
         </Tool>
         <div slot="content">
-            <div class="text-white select-none">Colors</div>
+            <div class="text-white select-none font-semibold">Colors</div>
             <ColorPicker />
         </div>
     </ToolbarCard>
@@ -69,8 +69,8 @@ import ToolbarIcon from "./ToolbarIcon.svelte";
             <FaPaintBrush />
         </Tool>
         <div class="space-y-3" slot="content">
-            <div class="text-white select-none">Brush</div>
-            <TipList />
+            <div class="text-white select-none font-semibold">Brush</div>
+            <!-- <TipList /> -->
             <div class="space-y-1">
                 <div class="text-gray-400">Size</div>
                 <SizeSlider bind:value={$brushSize} min={1} max={100} />
@@ -98,8 +98,8 @@ import ToolbarIcon from "./ToolbarIcon.svelte";
             <FaEraser />
         </Tool>
         <div class="space-y-3" slot="content">
-            <div class="text-white select-none">Eraser</div>
-            <TipList />
+            <div class="text-white select-none font-semibold">Eraser</div>
+            <!-- <TipList /> -->
             <div class="space-y-1">
                 <div class="text-gray-400">Size</div>
                 <SizeSlider bind:value={$eraserSize} min={1} max={100} />

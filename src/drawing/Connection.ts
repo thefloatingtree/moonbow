@@ -1,4 +1,5 @@
 import { MessageTypes } from '../../server/MessageTypes';
+import { app } from './App';
 
 type MessageType = typeof MessageTypes[keyof typeof MessageTypes];
 
@@ -10,9 +11,9 @@ export class Connection {
     public ws: WebSocket = null
     public joinURL = ""
 
-    public websocketURL = 'ws://localhost:5000'
-    // public websocketURL = window.location.href.replace(window.location.protocol, 'ws:')
-    
+    // public websocketURL = 'ws://localhost:5000'
+    public websocketURL = window.location.href.replace(window.location.protocol, 'ws:')
+
     private listeners: Array<Listener> = []
 
     public addMessageListener(listener: Listener) {
@@ -35,6 +36,15 @@ export class Connection {
                     this.startPingLoop()
                 }
 
+                if (message.type === MessageTypes.GetOwnerState) {
+                    const data = app.serialize()
+                    this.sendMessage(MessageTypes.GetOwnerState, { 
+                        recipientId: message.body.id, 
+                        roomId: message.body.roomId, 
+                        data 
+                    })
+                }
+
                 this.listeners.forEach(listener => listener(message))
             }
 
@@ -43,15 +53,15 @@ export class Connection {
         }
     }
 
-    
+
     public disconnect() {
         this.ws.close()
         this.ws = null
     }
-    
+
     public sendMessage(type: MessageType, message: Object) {
         if (this.ws.readyState === this.ws.OPEN)
-        this.ws.send(JSON.stringify({ type, body: message }))
+            this.ws.send(JSON.stringify({ type, body: message }))
     }
 
     private startPingLoop() {

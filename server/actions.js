@@ -3,6 +3,7 @@ import { MessageTypes } from './MessageTypes.js'
 import { app, rooms } from './server.js'
 import { colors } from './colors.js'
 import { names } from './names.js'
+import { addClientToRoom, getClientFromRoom, getOwnerFromRoom } from './clients.js'
 
 export function socketNotInRoom(socket) {
     return !socket.roomId
@@ -17,8 +18,13 @@ export function onClientMessage(ws, message) {
         case MessageTypes.GetCurrentState:
             sendCurrentState(ws)
             break
+        case MessageTypes.GetOwnerState:
+            const client = getClientFromRoom(data.body.roomId, data.body.recipientId)
+            sendCurrentState(client, data.body.data)
+            break
         case MessageTypes.Ping:
-            console.log("ping from " + ws.id)
+            // console.log("ping from " + ws.id)
+            // Do nothing
             break
         default:
             rebroadcast(data, ws)
@@ -90,7 +96,7 @@ export function sendClientEvent(data, ws) {
     }))
 }
 
-export function sendCurrentState(ws) {
+export function sendCurrentState(ws, data = null) {
 
     if (socketNotInRoom(ws)) return
 
@@ -106,7 +112,8 @@ export function sendCurrentState(ws) {
                     owner: socket.owner,
                     color: socket.color,
                 }
-            })
+            }),
+            data
         }
     }))
 }
@@ -138,6 +145,8 @@ export function connectToRoom(data, ws) {
     ws.color = colors[room.length]
     ws.name = name
 
+    addClientToRoom(ws.roomId, ws)
+
     ws.subscribe(`${roomId}/${MessageTypes.OnClientConnected}`)
     ws.subscribe(`${roomId}/${MessageTypes.OnClientDisconected}`)
     ws.subscribe(`${roomId}/${MessageTypes.OnClientMessage}`)
@@ -164,5 +173,16 @@ export function connectToRoom(data, ws) {
         }
     }))
 
-    sendCurrentState(ws)
+    if (ws.owner) {
+        sendCurrentState(ws)
+    } else {
+        const ownerClient = getOwnerFromRoom(ws.roomId)
+        ownerClient.send(JSON.stringify({
+            type: MessageTypes.GetOwnerState,
+            body: {
+                id: ws.id,
+                roomId: ws.roomId
+            }
+        }))
+    }
 }

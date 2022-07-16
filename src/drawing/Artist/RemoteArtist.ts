@@ -130,13 +130,6 @@ export class RemoteArtist extends Artist {
                 if (e.button === 0) app.canvas.endBrushStroke(e, this, true)
             })
 
-        // other tools
-        // this.toolManager.addTool(ToolType.Eyedropper)
-        //     .onMouseUp(e => {
-        //         const hex = app.viewport.colorAt(e)
-        //         brushColor.set(hex)
-        //     })
-
         this.toolManager.selectTool(ToolType.Brush)
     }
 }

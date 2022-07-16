@@ -47,6 +47,7 @@ export class App {
         this.animator = new Animator()
 
         this.artistManager.addListeners()
+        this.canvas.addListeners()
         this.connection.connect()
 
         this.addUIIntegrations()
