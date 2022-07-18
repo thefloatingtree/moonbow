@@ -5,6 +5,7 @@ import { app } from '../App'
 import type { Artist } from '../Artist/Artist'
 import { BrushStroke } from '../Brush/BrushStroke'
 import { renderAsSprite } from '../util'
+import type { Point } from 'pixi.js'
 
 
 export class Canvas {
@@ -106,20 +107,12 @@ export class Canvas {
     }
 
     updateBrushStroke(e: PointerEvent, artist: Artist, erase: boolean = false) {
-
-        if (!this.liveBrushStrokes.get(artist.id)) return
-
-        const { brushStroke, pointerDown } = this.liveBrushStrokes.get(artist.id)
-
-        if (pointerDown) {
-            const { x, y, pressure } = e
-            const pointInCanvasSpace = app.viewport.convertScreenToCanvas(x, y)
-            brushStroke.addNode(pointInCanvasSpace.x, pointInCanvasSpace.y, pressure)
-        }
+        const { x, y, pressure } = e
+        const pointInCanvasSpace = app.viewport.convertScreenToCanvas(x, y)
+        this.updateBrushStrokeWithPointInCanvasSpace({ x: pointInCanvasSpace.x, y: pointInCanvasSpace.y, pressure } as PointerEvent, artist, erase)
     }
 
     updateBrushStrokeWithPointInCanvasSpace(e: PointerEvent, artist: Artist, erase: boolean = false) {
-
         if (!this.liveBrushStrokes.get(artist.id)) return
 
         const { brushStroke, pointerDown } = this.liveBrushStrokes.get(artist.id)
