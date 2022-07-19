@@ -15,10 +15,19 @@ export class LocalArtist extends Artist {
     private cursor: Cursor
 
     constructor(id: string, name: string, owner: boolean, color: string) {
-        super(id, name, owner, color, new LocalEventSource())
+
+        const eventSource = new LocalEventSource()
+
+        super(id, name, owner, color, eventSource)
 
         this.cursor = new Cursor("localcursor", "#171717", true)
         app.application.stage.addChild(this.cursor.container)
+
+        eventSource.onMouseMove(e => {
+            // console.log(e)
+            this.cursor.x = e.x
+            this.cursor.y = e.y
+        })
 
         app.ref.addEventListener('mouseenter', () => {
             this.cursor.container.alpha = 1
@@ -26,10 +35,11 @@ export class LocalArtist extends Artist {
         app.ref.addEventListener('mouseleave', () => {
             this.cursor.container.alpha = 0
         })
-        app.ref.addEventListener('mousemove', (e) => {
-            this.cursor.x = e.x
-            this.cursor.y = e.y
-        })
+        // app.ref.addEventListener('mousemove', (e) => {
+        //     console.log(e)
+        //     this.cursor.x = e.x
+        //     this.cursor.y = e.y
+        // })
 
         this.addActions()
         this.addTools()
