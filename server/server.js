@@ -13,7 +13,7 @@ export const app = App()
     .ws('/*', {
         maxPayloadLength: 16 * 1024 * 1024,
         sendPingsAutomatically: true,
-        idleTimeout: 120,
+        idleTimeout: 0,
         message: onClientMessage,
         close: onClientDisconnect,
     })
