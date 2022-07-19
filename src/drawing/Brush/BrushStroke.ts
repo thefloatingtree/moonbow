@@ -21,7 +21,7 @@ export class BrushStroke {
         for (let i = 0; i < points.length; i++) {
             const { x, y } = points[i]
 
-            const interpolatedPressure = lerp(this.lastPressure, pressure, i / points.length)
+            const interpolatedPressure = lerp(pressure, this.lastPressure, i / points.length)
             const actualPressure = points.length === 1 ? pressure : interpolatedPressure
 
             const opacityPressure = this.brush.brushSettings.useOpacityPressure ? actualPressure : 1
