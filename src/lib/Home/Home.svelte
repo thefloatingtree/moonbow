@@ -3,6 +3,7 @@
     import Input from "../Common/Input.svelte";
     import { isHome } from "../stores/navigation";
     import { username } from "../stores/userSettings";
+    import appIconSVG from '../../assets/Icon.svg';
 
     let isJoining = new URLSearchParams(window.location.search).get("room") !== null;
 
@@ -12,9 +13,11 @@
     }
 </script>
 
-<div class="p-16 space-y-12">
-    <h1 class="text-gray-300 font-bold text-4xl">Multiplayer Drawing App</h1>
-
+<div class="p-16 space-y-6">
+    <div class="flex gap-6 items-center">
+        <div class="w-12 h-12"><img src={appIconSVG} alt="moonbow icon"></div>
+        <h1 class="text-gray-300 font-bold text-4xl">Moonbow</h1>
+    </div>
 
     <div class="space-y-3">
         <Input bind:value={$username} placeholder="Username"/>
