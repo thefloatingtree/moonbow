@@ -2,7 +2,7 @@
 
 ![Screenshot of app](https://cdn.discordapp.com/attachments/341062771263143938/994739652500140052/unknown.png)
 
-[Use it online here](http://multiplayer-drawing-app.herokuapp.com/)
+[https://moonbow.thefloatingtree.dev/](https://moonbow.thefloatingtree.dev/)
 
 ## Description
 
